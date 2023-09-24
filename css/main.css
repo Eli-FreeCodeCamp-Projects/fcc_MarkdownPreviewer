@@ -17,16 +17,18 @@ body {
 #previewer .size-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   width: 5px;
   margin: 10px 0;
   border: 1px solid black;
   background-color: linen;
+  cursor: move;
 }
 #previewer .size-container button {
+  position: absolute;
+  top: 50%;
   width: 40px;
-  height: 40px;
+  height: 30px;
   font-size: 1.5em;
   z-index: 1;
   background-color: rgb(20, 30, 40);
@@ -37,6 +39,9 @@ body {
   display: block;
   color: linen;
   pointer-events: none;
+}
+#previewer .size-container .ghost-drag {
+  visibility: hidden;
 }
 #previewer .preview-container {
   width: 50%;

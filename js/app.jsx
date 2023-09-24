@@ -82,6 +82,19 @@ class PreviewEditor extends React.Component {
     }
 }
 
+/**
+ * Resize element width, and set visibility to hidden if width value is <= to zero.
+ * @param element
+ * @param newWidth
+ */
+const resizePane = (element, newWidth) => {
+    if(newWidth > 0){
+        element.style.visibility = `visible`;
+        element.style.width = `${newWidth}px`;
+    }else{
+        element.style.visibility = `hidden`;
+    }
+}
 
 /**
  * Previewer Component
@@ -95,30 +108,38 @@ class Previewer extends React.Component {
         this.handleDrag = this.handleDrag.bind(this)
 
     }
+
+    /**
+     * handleDragStart
+     * @param e The react event handler
+     */
     handleDragStart(e){
-        console.log(`Drag Start :->`);
-        this.btn_top = e.target.offsetTop;
+        // set invisible element to ghost drag image to hidden ghost image
+        e.dataTransfer.setDragImage(e.target.lastChild, 0, 0);
     }
 
-    handleDrag(e){
+    /**
+     * handleDrag
+     * Update width values of left and right pane,
+     * and update left position of resizer bar.
+     * @param e The react event handler
+     * @param left_pane_min min width of left pane
+     * @param right_pane_min min width of right pane
+     */
+    handleDrag(e, left_pane_min = 0, right_pane_min = 0){
         e.preventDefault()
-        const line = e.target.parentElement;
-        const editor = line.parentElement.firstChild;
-        const previewer = line.parentElement.lastChild;
-        const mouse_x = e.pageX;
-        const w_editor = mouse_x - editor.offsetLeft;
-        const w_previewer = (previewer.offsetLeft + previewer.offsetWidth) - mouse_x;
-        if(mouse_x > 100 &&  mouse_x < window.innerWidth - 100 ){
-            editor.style.width = `${w_editor}px`;
-            if(this.btn_top > 0) {
-                console.log(`fixed button height :-> ${this.btn_top} -- target: ${e.target}`);
-                console.log(e.target);
-                e.target.top = this.btn_top
-            }
-            previewer.style.width = `${w_previewer}px`;
+        const line = e.target,
+            editor = line.parentElement.firstChild,
+            previewer = line.parentElement.lastChild,
+            mouse_x = e.pageX,
+            w_editor = mouse_x - editor.offsetLeft,
+            w_previewer = (previewer.offsetLeft + previewer.offsetWidth) - mouse_x;
+        if(mouse_x > left_pane_min &&  mouse_x < window.innerWidth - right_pane_min ){
+            resizePane(editor, w_editor);
+            resizePane(previewer, w_previewer);
             line.style.left = `${mouse_x}px`;
-            console.log(`Drag :-> mouse_x: ${mouse_x} -- w_editor: ${w_editor} -- w_previewer: ${w_previewer} -- e:`);
-            console.log(e);
+            //console.log(`Drag :-> mouse_x: ${mouse_x} -- w_editor: ${w_editor} -- w_previewer: ${w_previewer} -- e:`);
+            //console.log(e);
         }
 
 
@@ -133,7 +154,7 @@ class Previewer extends React.Component {
         console.log(this.props);
 
         return(
-            <div id="previewer" className={`d-flex justify-content-between overflow-hidden`}>
+            <div id="previewer" className={`d-flex justify-content-between overflow-hidden  min-vh-100`}>
                 <div className="p-1 editor-container">
                     <div className="card text-bg-dark h-100 border-light">
                         <div className="card-header border-light">Markdown Editor</div>
@@ -142,13 +163,14 @@ class Previewer extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="size-container">
-                    <button type="button" className="btn btn-light" onDragStart={this.handleDragStart} onDrag={this.handleDrag} onDragEnd={this.handleDragEnd} draggable>
+                <div className="size-container" onDragStart={this.handleDragStart} onDrag={this.handleDrag} onDragEnd={this.handleDragEnd} draggable>
+                    <button type="button" className="btn btn-light">
                         <i className="fas fa-arrows-alt-h"></i>
                     </button>
+                    <div className="ghost-drag"></div>
                 </div>
                 <div className="p-1  preview-container">
-                    <div className="card text-bg-dark border-light">
+                    <div className="card text-bg-dark h-100 border-light">
                         <div className="card-header border-light">Html Preview</div>
                         <div className="card-body">
                             <PreviewOutput output_text={this.props.output_text}  />

@@ -1,4 +1,5 @@
 $background-color-main: rgb(20, 30, 40);
+$text-color-main: linen;
 $background-color-code: rgb(60, 70, 80);
 $pri-font: 'Corben', serif;
 $sec-font: 'Lato', sans-serif;
@@ -25,16 +26,18 @@ body{
   .size-container{
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    //justify-content: center;
     align-items: center;
-
     width: 5px;
     margin: 10px 0;
     border: 1px solid black;
     background-color: linen;
+    cursor: move;
     button{
+      position: absolute;
+      top: 50%;
       width: 40px;
-      height: 40px;
+      height: 30px;
       font-size: 1.5em;
       z-index: 1;
       background-color: $background-color-main;
@@ -45,6 +48,9 @@ body{
         color: linen;
         pointer-events: none; // add this line
       }
+    }
+    .ghost-drag{
+      visibility: hidden;
     }
   }
   .preview-container{
