@@ -42,7 +42,7 @@ const refreshPreview = (data) => {
             const output_value = sanitize_md(
                 parse_markdown(data)
             )
-            store.dispatch(
+            dispatch(
                 refresh(
                     {input_text: data, output_text: output_value}
                 )
