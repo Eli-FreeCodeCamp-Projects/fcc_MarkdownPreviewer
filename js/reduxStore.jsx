@@ -43,8 +43,8 @@ const refreshPreview = (data) => {
 const defaultState = {
     status: true,
     error_msg: '',
-    input_text: '',
-    output_text: ''
+    input_text: defaultInput,
+    output_text: parse_markdown(defaultInput)
 };
 
 /**

@@ -30,36 +30,9 @@ class PreviewEditor extends React.Component {
 
     constructor(props) {
         super(props);
-        this.set_default_input = this.set_default_input.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
-    set_default_input(){
-        let default_text = '# Title 1\n\r';
-        default_text += 'Some text with inline code ``<div</div>``.\r';
-        default_text += '## Title 2   \r';
-        default_text += '[Github acount](https://github.com/mano8)\r';
-        default_text += 'Here is a code block example:\r';
-        default_text += '```\r';
-        default_text += '<h1>Title 1</h1> \r';
-        default_text += '<h2>Title 2</h2> \r';
-        default_text += '```\r';
-        default_text += 'Here is a list example:\r';
-        default_text += ' - Item 1\r';
-        default_text += ' - Item 2\r';
-        default_text += ' - Item 3\r';
-        default_text += ' - Item 4\r';
-        default_text += '  \r';
-        default_text += 'Here is a blockquote example:\r';
-        default_text += '> Hello World !!!\r';
-        default_text += 'You can also make text **bold**... whoa!\r';
-        default_text += 'Or _italic_.\r';
-        default_text += 'Or... wait for it... **_both!_**\r';
-        default_text += '\r\r';
-        default_text += '![freeCodeCamp Logo](https://cdn.freecodecamp.org/testable-projects-fcc/images/fcc_secondary.svg)\r';
-        this.props.refreshPreview(default_text);
-        return default_text;
-    }
     handleChange(e){
         const value = e.target.value;
         this.props.refreshPreview(value)
@@ -75,8 +48,13 @@ class PreviewEditor extends React.Component {
         return(
             <div className={`container-fluid h-100`}>
                 <div className="form-floating h-100">
-                    <textarea id="editor" name="editor" className="form-control text-bg-dark h-100" onChange={this.handleChange} >
-                        {(this.props.input_text) ? this.props.input_text : this.set_default_input()}
+                    <textarea
+                        id="editor"
+                        name="editor"
+                        className="form-control text-bg-dark h-100"
+                        onChange={this.handleChange}
+                        value={this.props.input_text}>
+
                     </textarea>
                     <label htmlFor="editor">Type your Markdown</label>
 
