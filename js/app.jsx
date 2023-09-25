@@ -124,7 +124,7 @@ class Previewer extends React.Component {
         if(ut.isPositiveNumber(leftPos)){
             return {
                 left: `${leftPos}`
-            }
+            };
         }
         return null;
 
@@ -296,8 +296,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         refreshPreview: (text) => {
             console.log("Refresh Preview.");
-            console.log("Dispatch data.");
-            console.log(text);
+            console.log("Dispatch data length.");
+            console.log(text.length);
             dispatch(refreshPreview(text));
         }
     }
