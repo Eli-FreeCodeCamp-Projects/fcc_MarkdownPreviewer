@@ -2,29 +2,6 @@
  * Redux Store
  * Use redux.js, purify.js, marked.js
  */
-const sanitize_md = (text) => {
-    return DOMPurify.sanitize(
-        text, {USE_PROFILES: {html: true}, ADD_ATTR: ['target'] }
-    )
-}
-
-const parse_markdown = (text) => {
-    const link_extension = {
-        name: 'link',
-        renderer(token) {
-            return `<a target="_blank" href="${token.href}">${token.text}</a>`;
-        }
-    }
-
-    marked.use({
-        gfm: true,
-        breaks: true,
-        extensions: [
-            link_extension
-        ]
-    });
-    return marked.parse(text)
-}
 
 //-> Actions constant
 const REFRESH = 'REFRESH',
@@ -49,9 +26,11 @@ const refreshPreview = (data) => {
             );
         }
         catch (e) {
-            console.log("Fatal Error: Unable to Refresh Preview");
-            console.log(e);
-            store.dispatch(dataError("Sorry we are unable to preview markdown, check your code please."))
+            if(debug) {
+                console.log("Fatal Error: Unable to Refresh Preview");
+                console.log(e);
+            }
+            dispatch(dataError("Sorry we are unable to preview markdown, check your code please."))
         }
     }
 
@@ -74,9 +53,7 @@ const defaultState = {
 const DataReducer = (state = defaultState, action) => {
     switch(action.type) {
         case REFRESH:
-            console.log("REFRESH Preview action.");
-            console.log("Actual input md : ")
-            console.log(action.data)
+            if(debug) { console.log("REFRESH Preview action from Reducer."); }
             return {
                 status: true,
                 error_msg: '',
@@ -84,7 +61,7 @@ const DataReducer = (state = defaultState, action) => {
                 output_text: action.output_text
             };
         case DATA_ERROR:
-            console.log("DATA_ERROR Quote action.");
+            if(debug) { console.log("DATA_ERROR Quote action from Reducer."); }
             return {
                 status: true,
                 error_msg: '',

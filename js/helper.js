@@ -1,7 +1,7 @@
 /**
  * Helper functions
  */
-
+const debug = true;
 
 /**
  * Sanitize html string with DOMPurify.js package.
@@ -75,6 +75,7 @@ const ut = {
         return (typeof value === 'string' || value instanceof String)
     }
 }
+
 
 const defaultInput = "# Title 1\n" +
     "\n" +
