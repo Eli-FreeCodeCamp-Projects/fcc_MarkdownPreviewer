@@ -107,9 +107,52 @@ class Previewer extends React.Component {
 
     constructor(props) {
         super(props);
-        this.btn_top = 0;
-        this.handleDragStart = this.handleDragStart.bind(this)
-        this.handleDrag = this.handleDrag.bind(this)
+        this.handleDragEnd = this.handleDragEnd.bind(this);
+    }
+    getStoredSize(){
+        let storageData = localStorage.getItem("m8Prv_sizes");
+        if(storageData){
+            storageData = JSON.parse(storageData)
+            console.log("getStoredSize : ------------------------------------------->");
+            console.log(storageData);
+            console.log(typeof storageData);
+            return storageData.sizes;
+        }
+        return null;
+    }
+
+    setStoredSize(data){
+        return localStorage.setItem("m8Prv_sizes", JSON.stringify(data));
+    }
+
+    getDefaultWidthStyle(size){
+        console.log(`getDefaultWidthStyle :------------------------------------>`);
+        console.log(size);
+        if(size && size > 0){
+            return {
+                width: `${size}px`,
+                visibility: 'visible'
+            }
+        }else{
+            return{
+                visibility: 'hidden'
+            }
+        }
+
+    }
+
+    getDefaultLeftStyle(leftPos){
+        console.log(`getDefaultLeftStyle :------------------------------------>`);
+        console.log(leftPos);
+        if(leftPos && leftPos > 0){
+            return {
+                left: `${leftPos}`
+            }
+        }
+        return null
+
+    }
+    componentDidMount(){
 
     }
 
@@ -150,16 +193,31 @@ class Previewer extends React.Component {
     }
     handleDragEnd(e){
         console.log(`Drag End :->`);
+        const editor = e.target.parentElement.firstChild,
+            previewer = e.target.parentElement.lastChild,
+            resizer = e.target.parentElement.childNodes[1]
+        this.setStoredSize({
+            sizes: {
+                w_editor: editor.offsetWidth,
+                w_previewer: previewer.offsetWidth,
+                l_line: resizer.offsetLeft,
+            }
+        })
     }
 
     render(){
         console.log("Render Previewer Component.");
         console.log("Previewer props : ");
         console.log(this.props);
-
+        const storageData = this.getStoredSize();
+        const editor_style = (storageData.w_editor) ? this.getDefaultWidthStyle(storageData.w_editor) : null;
+        const preview_style = (storageData.w_previewer) ? this.getDefaultWidthStyle(storageData.w_previewer) : null;
+        const resizer_style = (storageData.l_line) ? this.getDefaultLeftStyle(storageData.l_line) : null;
+        console.log("editor_style : ------------------------------------------->");
+        console.log(editor_style);
         return(
             <div id="previewer" className={`d-flex justify-content-between overflow-hidden  min-vh-100`}>
-                <div className="p-1 editor-container">
+                <div className="p-1 editor-container" style={editor_style ? editor_style : {}}>
                     <div className="card text-bg-dark h-100 border-light">
                         <div className="card-header border-light">Markdown Editor</div>
                         <div className="card-body">
@@ -167,13 +225,19 @@ class Previewer extends React.Component {
                         </div>
                     </div>
                 </div>
-                <div className="size-container" onDragStart={this.handleDragStart} onDrag={this.handleDrag} onDragEnd={this.handleDragEnd} draggable>
+                <div
+                    className="size-container"
+                    onDragStart={this.handleDragStart}
+                    onDrag={this.handleDrag}
+                    onDragEnd={this.handleDragEnd}
+                    draggable
+                    style={resizer_style ? resizer_style : {}}>
                     <button type="button" className="btn btn-light">
                         <i className="fas fa-arrows-alt-h"></i>
                     </button>
                     <div className="ghost-drag"></div>
                 </div>
-                <div className="p-1  preview-container">
+                <div className="p-1  preview-container" style={preview_style ? preview_style : {}}>
                     <div className="card text-bg-dark h-100 border-light">
                         <div className="card-header border-light">Html Preview</div>
                         <div className="card-body">
