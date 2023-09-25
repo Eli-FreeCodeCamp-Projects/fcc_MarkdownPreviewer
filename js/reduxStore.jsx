@@ -16,9 +16,7 @@ const dataError = (error) => { return {type: DATA_ERROR, error: error} };
 const refreshPreview = (data) => {
     return function(dispatch){
         try {
-            const output_value = sanitize_md(
-                parse_markdown(data)
-            )
+            const output_value = parse_markdown(data)
             dispatch(
                 refresh(
                     {input_text: data, output_text: output_value}

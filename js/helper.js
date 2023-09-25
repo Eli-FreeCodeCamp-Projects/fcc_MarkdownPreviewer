@@ -37,7 +37,8 @@ const parse_markdown = (text) => {
             link_extension
         ]
     });
-    return marked.parse(text)
+    const result = marked.parse(text)
+    return sanitize_md(result)
 }
 
 /**
