@@ -70,7 +70,7 @@ const ut = {
         return !isNaN(value) && value != null
     },
     isPositiveNumber: (value) => {
-        return this.isNumber(value) && value > 0
+        return ut.isNumber(value) && value > 0
     },
     isStr: (value) => {
         return (typeof value === 'string' || value instanceof String)
