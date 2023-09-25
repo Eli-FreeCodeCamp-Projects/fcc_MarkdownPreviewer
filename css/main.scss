@@ -65,14 +65,6 @@ header{
       visibility: hidden;
     }
   }
-  .size-container:after {
-    content: '';
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    position: absolute;
-  }
   .preview-container{
     width: 50%;
     .card-body{

@@ -195,6 +195,7 @@ class Previewer extends React.Component {
                 l_line: resizer.offsetLeft,
             }
         })
+        document.ondragover = null;
     }
     handleMouseMove(e){
         if(this.resizeStarted){
@@ -204,7 +205,7 @@ class Previewer extends React.Component {
     }
 
     componentWillUnmount() {
-        document.removeEventListener("ondragover", this.handleMouseMove)
+        document.ondragover = null;
     }
 
     render(){
