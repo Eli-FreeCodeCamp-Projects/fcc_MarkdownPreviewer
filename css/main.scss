@@ -14,9 +14,21 @@ body{
   min-height: 100vh;
   min-height: -webkit-fill-available;
   background-color: $background-color-main;
-  color: linen;
+  color: $text-color-main;
 }
 
+header{
+  padding: 0;
+  background-color: $text-color-main;
+  color: $background-color-main;
+  border-radius: 0 0 10px 10px;
+  border-bottom: 5px solid $background-color-code;
+  h1{
+    padding: 15px;
+    margin: 0;
+    font-family: $pri-font;
+  }
+}
 
 
 #previewer{

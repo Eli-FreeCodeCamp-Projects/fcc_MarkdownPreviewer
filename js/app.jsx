@@ -229,6 +229,7 @@ class Root extends React.Component {
             }else{
                 return(
                     <section className="container-fluid min-vh-100">
+                        <header><h1>Markdown Previewer App</h1></header>
                         <Previewer
                             input_text={this.props.data.input_text}
                             output_text={this.props.data.output_text}
