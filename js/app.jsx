@@ -71,7 +71,12 @@ class Previewer extends React.Component {
 
     constructor(props) {
         super(props);
+        this.resizeStarted = false;
+        this.mouseLeft = 0;
+        this.handleDragStart = this.handleDragStart.bind(this);
+        this.handleDrag = this.handleDrag.bind(this);
         this.handleDragEnd = this.handleDragEnd.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
     }
 
     /**
@@ -135,8 +140,18 @@ class Previewer extends React.Component {
      * @param e The react event handler
      */
     handleDragStart(e){
+        // init drag event for firefox
+        // see :
+        //  - https://bugzilla.mozilla.org/show_bug.cgi?id=568313
+        //  - https://bugzilla.mozilla.org/show_bug.cgi?id=646823#c4
+        console.log(`handleDragStart :->`);
+        this.resizeStarted = true;
+        e.dataTransfer.setData('text/plain', 'node');
         // set invisible element to ghost drag image to hidden ghost image
         e.dataTransfer.setDragImage(e.target.lastChild, 0, 0);
+        // handle dragover to get mouse position (firefox need it)
+        // see: https://stackoverflow.com/questions/5798167/getting-mouse-position-while-dragging-js-html5
+        document.ondragover = this.handleMouseMove;
     }
 
     /**
@@ -148,18 +163,20 @@ class Previewer extends React.Component {
      * @param right_pane_min min width of right pane
      */
     handleDrag(e, left_pane_min = 0, right_pane_min = 0){
-        e.preventDefault()
+        console.log(`handleDrag :->`);
+        //e.preventDefault()
         const line = e.target,
             editor = line.parentElement.firstChild,
             previewer = line.parentElement.lastChild,
-            mouse_x = e.pageX,
+            mouse_x = this.mouseLeft,
             w_editor = mouse_x - editor.offsetLeft,
             w_previewer = (previewer.offsetLeft + previewer.offsetWidth) - mouse_x;
+        console.log(`Drag :-> mouse_x: ${mouse_x} -- w_editor: ${w_editor} -- w_previewer: ${w_previewer}`);
         if(mouse_x > left_pane_min &&  mouse_x < window.innerWidth - right_pane_min ){
             resizePane(editor, w_editor);
             resizePane(previewer, w_previewer);
             line.style.left = `${mouse_x}px`;
-            //console.log(`Drag :-> mouse_x: ${mouse_x} -- w_editor: ${w_editor} -- w_previewer: ${w_previewer} -- e:`);
+            console.log(`Resize Panes`);
             //console.log(e);
         }
 
@@ -167,6 +184,7 @@ class Previewer extends React.Component {
     }
     handleDragEnd(e){
         console.log(`Drag End :->`);
+        this.resizeStarted = false;
         const editor = e.target.parentElement.firstChild,
             previewer = e.target.parentElement.lastChild,
             resizer = e.target.parentElement.childNodes[1]
@@ -177,6 +195,16 @@ class Previewer extends React.Component {
                 l_line: resizer.offsetLeft,
             }
         })
+    }
+    handleMouseMove(e){
+        if(this.resizeStarted){
+            console.log(`handleMouseMove :-> resizeStarted`);
+            this.mouseLeft = e.pageX;
+        }
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener("ondragover", this.handleMouseMove)
     }
 
     render(){
@@ -190,7 +218,8 @@ class Previewer extends React.Component {
         console.log("editor_style : ------------------------------------------->");
         console.log(editor_style);
         return(
-            <div id="previewer" className={`d-flex justify-content-between overflow-hidden  min-vh-100`}>
+            <div id="previewer"
+                 className={`d-flex justify-content-between overflow-hidden  min-vh-100`}>
                 <div className="p-1 editor-container" style={editor_style ? editor_style : {}}>
                     <div className="card text-bg-dark h-100 border-light">
                         <div className="card-header border-light">Markdown Editor</div>
@@ -204,7 +233,7 @@ class Previewer extends React.Component {
                     onDragStart={this.handleDragStart}
                     onDrag={this.handleDrag}
                     onDragEnd={this.handleDragEnd}
-                    draggable
+                    draggable="true"
                     style={resizer_style ? resizer_style : {}}>
                     <button type="button" className="btn btn-light">
                         <i className="fas fa-arrows-alt-h"></i>
