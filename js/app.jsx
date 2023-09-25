@@ -73,25 +73,33 @@ class Previewer extends React.Component {
         super(props);
         this.handleDragEnd = this.handleDragEnd.bind(this);
     }
+
+    /**
+     * Get stored Previewer panes sizes in local Storage
+     * @return {*|null}
+     */
     getStoredSize(){
         let storageData = localStorage.getItem("m8Prv_sizes");
-        if(storageData){
-            storageData = JSON.parse(storageData)
-            console.log("getStoredSize : ------------------------------------------->");
-            console.log(storageData);
-            console.log(typeof storageData);
-            return storageData.sizes;
+        if(ut.isStr(storageData)){
+            storageData = JSON.parse(storageData);
         }
-        return null;
+        return (ut.isObject(storageData)) ? storageData.sizes : null;
     }
 
+    /**
+     * Save Previewer panes sizes in localStorage
+     * @param data
+     */
     setStoredSize(data){
-        return localStorage.setItem("m8Prv_sizes", JSON.stringify(data));
+        localStorage.setItem("m8Prv_sizes", JSON.stringify(data));
     }
 
+    /**
+     * Get default width styles for Previewer panes
+     * @param size
+     * @return {{visibility: string, width: string}|{visibility: string}}
+     */
     getDefaultWidthStyle(size){
-        console.log(`getDefaultWidthStyle :------------------------------------>`);
-        console.log(size);
         if(size && size > 0){
             return {
                 width: `${size}px`,
@@ -105,18 +113,20 @@ class Previewer extends React.Component {
 
     }
 
+    /**
+     * Used to set left position to Previewer resizer Bar
+     * @param leftPos
+     * @return {{left: string}|null}
+     */
     getDefaultLeftStyle(leftPos){
         console.log(`getDefaultLeftStyle :------------------------------------>`);
         console.log(leftPos);
-        if(leftPos && leftPos > 0){
+        if(ut.isPositiveNumber(leftPos)){
             return {
                 left: `${leftPos}`
             }
         }
-        return null
-
-    }
-    componentDidMount(){
+        return null;
 
     }
 
