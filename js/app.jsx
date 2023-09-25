@@ -65,20 +65,6 @@ class PreviewEditor extends React.Component {
 }
 
 /**
- * Resize element width, and set visibility to hidden if width value is <= to zero.
- * @param element
- * @param newWidth
- */
-const resizePane = (element, newWidth) => {
-    if(newWidth > 0){
-        element.style.visibility = `visible`;
-        element.style.width = `${newWidth}px`;
-    }else{
-        element.style.visibility = `hidden`;
-    }
-}
-
-/**
  * Previewer Component
  */
 class Previewer extends React.Component {
