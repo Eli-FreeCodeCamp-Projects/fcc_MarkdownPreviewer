@@ -210,9 +210,9 @@ class Previewer extends React.Component {
         console.log("Previewer props : ");
         console.log(this.props);
         const storageData = this.getStoredSize();
-        const editor_style = (storageData.w_editor) ? this.getDefaultWidthStyle(storageData.w_editor) : null;
-        const preview_style = (storageData.w_previewer) ? this.getDefaultWidthStyle(storageData.w_previewer) : null;
-        const resizer_style = (storageData.l_line) ? this.getDefaultLeftStyle(storageData.l_line) : null;
+        const editor_style = (storageData && storageData.w_editor) ? this.getDefaultWidthStyle(storageData.w_editor) : null;
+        const preview_style = (storageData && storageData.w_previewer) ? this.getDefaultWidthStyle(storageData.w_previewer) : null;
+        const resizer_style = (storageData && storageData.l_line) ? this.getDefaultLeftStyle(storageData.l_line) : null;
         console.log("editor_style : ------------------------------------------->");
         console.log(editor_style);
         return(
