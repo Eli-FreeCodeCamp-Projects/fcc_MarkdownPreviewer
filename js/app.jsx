@@ -30,36 +30,9 @@ class PreviewEditor extends React.Component {
 
     constructor(props) {
         super(props);
-        this.set_default_input = this.set_default_input.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
-    set_default_input(){
-        let default_text = '# Title 1\n\r';
-        default_text += 'Some text with inline code ``<div</div>``.\r';
-        default_text += '## Title 2   \r';
-        default_text += '[Github acount](https://github.com/mano8)\r';
-        default_text += 'Here is a code block example:\r';
-        default_text += '```\r';
-        default_text += '<h1>Title 1</h1> \r';
-        default_text += '<h2>Title 2</h2> \r';
-        default_text += '```\r';
-        default_text += 'Here is a list example:\r';
-        default_text += ' - Item 1\r';
-        default_text += ' - Item 2\r';
-        default_text += ' - Item 3\r';
-        default_text += ' - Item 4\r';
-        default_text += '  \r';
-        default_text += 'Here is a blockquote example:\r';
-        default_text += '> Hello World !!!\r';
-        default_text += 'You can also make text **bold**... whoa!\r';
-        default_text += 'Or _italic_.\r';
-        default_text += 'Or... wait for it... **_both!_**\r';
-        default_text += '\r\r';
-        default_text += '![freeCodeCamp Logo](https://cdn.freecodecamp.org/testable-projects-fcc/images/fcc_secondary.svg)\r';
-        this.props.refreshPreview(default_text);
-        return default_text;
-    }
     handleChange(e){
         const value = e.target.value;
         this.props.refreshPreview(value)
@@ -75,28 +48,19 @@ class PreviewEditor extends React.Component {
         return(
             <div className={`container-fluid h-100`}>
                 <div className="form-floating h-100">
-                    <textarea id="editor" name="editor" className="form-control text-bg-dark h-100" onChange={this.handleChange} >
-                        {(this.props.input_text) ? this.props.input_text : this.set_default_input()}
+                    <textarea
+                        id="editor"
+                        name="editor"
+                        className="form-control text-bg-dark h-100"
+                        onChange={this.handleChange}
+                        value={this.props.input_text}>
+
                     </textarea>
                     <label htmlFor="editor">Type your Markdown</label>
 
                 </div>
             </div>
         )
-    }
-}
-
-/**
- * Resize element width, and set visibility to hidden if width value is <= to zero.
- * @param element
- * @param newWidth
- */
-const resizePane = (element, newWidth) => {
-    if(newWidth > 0){
-        element.style.visibility = `visible`;
-        element.style.width = `${newWidth}px`;
-    }else{
-        element.style.visibility = `hidden`;
     }
 }
 
@@ -109,25 +73,33 @@ class Previewer extends React.Component {
         super(props);
         this.handleDragEnd = this.handleDragEnd.bind(this);
     }
+
+    /**
+     * Get stored Previewer panes sizes in local Storage
+     * @return {*|null}
+     */
     getStoredSize(){
         let storageData = localStorage.getItem("m8Prv_sizes");
-        if(storageData){
-            storageData = JSON.parse(storageData)
-            console.log("getStoredSize : ------------------------------------------->");
-            console.log(storageData);
-            console.log(typeof storageData);
-            return storageData.sizes;
+        if(ut.isStr(storageData)){
+            storageData = JSON.parse(storageData);
         }
-        return null;
+        return (ut.isObject(storageData)) ? storageData.sizes : null;
     }
 
+    /**
+     * Save Previewer panes sizes in localStorage
+     * @param data
+     */
     setStoredSize(data){
-        return localStorage.setItem("m8Prv_sizes", JSON.stringify(data));
+        localStorage.setItem("m8Prv_sizes", JSON.stringify(data));
     }
 
+    /**
+     * Get default width styles for Previewer panes
+     * @param size
+     * @return {{visibility: string, width: string}|{visibility: string}}
+     */
     getDefaultWidthStyle(size){
-        console.log(`getDefaultWidthStyle :------------------------------------>`);
-        console.log(size);
         if(size && size > 0){
             return {
                 width: `${size}px`,
@@ -141,18 +113,20 @@ class Previewer extends React.Component {
 
     }
 
+    /**
+     * Used to set left position to Previewer resizer Bar
+     * @param leftPos
+     * @return {{left: string}|null}
+     */
     getDefaultLeftStyle(leftPos){
         console.log(`getDefaultLeftStyle :------------------------------------>`);
         console.log(leftPos);
-        if(leftPos && leftPos > 0){
+        if(ut.isPositiveNumber(leftPos)){
             return {
                 left: `${leftPos}`
-            }
+            };
         }
-        return null
-
-    }
-    componentDidMount(){
+        return null;
 
     }
 
@@ -322,8 +296,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         refreshPreview: (text) => {
             console.log("Refresh Preview.");
-            console.log("Dispatch data.");
-            console.log(text);
+            console.log("Dispatch data length.");
+            console.log(text.length);
             dispatch(refreshPreview(text));
         }
     }
