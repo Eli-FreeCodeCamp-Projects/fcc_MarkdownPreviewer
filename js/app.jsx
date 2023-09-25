@@ -74,9 +74,13 @@ class PreviewEditor extends React.Component {
 
         return(
             <div className={`container-fluid h-100`}>
-                <textarea id="editor" name="editor" className="form-control text-bg-dark h-100" onChange={this.handleChange} >
-                    {(this.props.input_text) ? this.props.input_text : this.set_default_input()}
-                </textarea>
+                <div className="form-floating h-100">
+                    <textarea id="editor" name="editor" className="form-control text-bg-dark h-100" onChange={this.handleChange} >
+                        {(this.props.input_text) ? this.props.input_text : this.set_default_input()}
+                    </textarea>
+                    <label htmlFor="editor">Type your Markdown</label>
+
+                </div>
             </div>
         )
     }
