@@ -24,46 +24,26 @@ header h1 {
   font-family: "Corben", serif;
 }
 
+#previewer .card-header h2 {
+  font-size: 1.1em;
+  margin: 0;
+}
 #previewer .editor-container {
-  width: 50%;
+  width: 100%;
+  height: 300px;
+}
+#previewer .editor-container #editor {
+  min-height: 300px;
 }
 #previewer .size-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 5px;
-  margin: 10px 0;
-  border: 1px solid black;
-  background-color: linen;
-  cursor: move;
-}
-#previewer .size-container button {
-  position: absolute;
-  top: 50%;
-  width: 40px;
-  height: 30px;
-  font-size: 1.5em;
-  z-index: 1;
-  background-color: rgb(20, 30, 40);
-  padding: 0;
-  cursor: move;
-}
-#previewer .size-container button i {
-  display: block;
-  color: linen;
-  pointer-events: none;
+  display: none;
 }
 #previewer .size-container .ghost-drag {
-  visibility: hidden;
+  display: none;
 }
 #previewer .preview-container {
-  width: 50%;
+  width: 100%;
 }
-#previewer .preview-container .card-body {
-  padding-left: 30px;
-  padding-right: 30px;
-}
-
 #preview h1, #preview h2, #preview h3, #preview h4, #preview h5 {
   font-family: "Corben", serif;
 }
@@ -83,6 +63,53 @@ header h1 {
   max-width: 90%;
 }
 
+@media only screen and (min-width: 768px) {
+  #previewer .editor-container {
+    width: 50%;
+    padding: 0 0 10px 0;
+    height: unset;
+  }
+  #previewer .editor-container .card, #previewer .editor-container .form-floating, #previewer .editor-container .container-fluid, #previewer .editor-container #editor {
+    height: 100% !important;
+  }
+  #previewer .size-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 5px;
+    margin: 10px 0;
+    border: 1px solid black;
+    background-color: linen;
+    cursor: move;
+  }
+  #previewer .size-container button {
+    position: fixed;
+    top: 50%;
+    width: 40px;
+    height: 30px;
+    font-size: 1.5em;
+    z-index: 1;
+    background-color: rgb(20, 30, 40);
+    padding: 0;
+    cursor: move;
+  }
+  #previewer .size-container button i {
+    display: block;
+    color: linen;
+    pointer-events: none;
+  }
+  #previewer .size-container .ghost-drag {
+    visibility: hidden;
+  }
+  #previewer .preview-container {
+    width: 50%;
+    padding: 0 0 10px 0;
+  }
+  #previewer .preview-container .card-body {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
 .anim-opacity {
   background-color: transparent;
   z-index: 3;
@@ -95,9 +122,9 @@ header h1 {
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
+  height: 100%;
   opacity: 0;
-  background: linear-gradient(80deg, black, rgb(20, 30, 40));
+  background: linear-gradient(80deg, linen, rgb(20, 30, 40));
   animation: opacity-up 0.5s ease-in-out 0s 1;
   z-index: 2;
 }
@@ -107,7 +134,7 @@ header h1 {
     opacity: 0;
   }
   75% {
-    opacity: 0.5;
+    opacity: 0.2;
   }
 }
 @keyframes opacity-down {
