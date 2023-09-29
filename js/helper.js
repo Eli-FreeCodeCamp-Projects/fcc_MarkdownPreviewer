@@ -85,6 +85,446 @@ class DataStorage{
 }
 
 
+class PreviewerHelper{
+    COMBO_PANE = 'COMBO_PANE'
+    LEFT_PANE = 'LEFT_PANE'
+    RIGHT_PANE = 'RIGHT_PANE'
+    DISPLAY_VERTICAL = 'DISPLAY_VERTICAL';
+    DISPLAY_HORIZONTAL = 'DISPLAY_HORIZONTAL';
+
+    constructor(props){
+        this.storageKey = "m8Prv_sizes";
+        this.window = {
+            minWidth: 768,
+            isWide: true,
+            resizeStarted: false,
+            mouseLeft: 0,
+            width: null
+        };
+        this.nav = {
+            left: '#m8-left-expand',
+            combo: '#m8-expand-combo',
+            right: '#m8-right-expand',
+            status: this.COMBO_PANE
+        }
+        this.editor = {
+            selector: '#previewer .editor-container',
+            nav: '#m8-left-expand',
+            width: null,
+            left: null,
+            minWidth: 150
+        };
+        this.preview = {
+            selector: '#previewer .preview-container',
+            nav: '#m8-right-expand',
+            width: null,
+            left: null,
+            minWidth: 150
+        };
+        this.resizeBar = {
+            selector:  '#previewer .size-container',
+            left: null
+        };
+        this.setProps(props)
+    }
+
+    isSelector(selector){
+        return ut.isStr(selector)
+    }
+    isElement(element){
+        return ut.isObject(element)
+    }
+
+    getPaneStatus(){
+        return this.nav.status
+    }
+    setWindowProps(props){
+        if(ut.isObject(props) && ut.isPositiveNumber(props.minWidth)){
+            this.window.minWidth = props.minWidth
+        }
+    }
+    setEditorProps(props){
+        if(ut.isObject(props)){
+            this.editor.selector = (this.isSelector(props.selector)) ? props.selector : this.editor.selector;
+            this.editor.minWidth = (ut.isNumber(props.minWidth)) ? props.minWidth : this.editor.minWidth;
+        }
+    }
+    setPreviewProps(props){
+        if(ut.isObject(props)){
+            this.preview.selector = (this.isSelector(props.selector)) ? props.selector : this.preview.selector;
+            this.preview.minWidth = (ut.isNumber(props.minWidth)) ? props.minWidth : this.preview.minWidth;
+        }
+    }
+    setResizeBarProps(props){
+        if(ut.isObject(props)){
+            this.resizeBar.selector = (this.isSelector(props.selector)) ? props.selector : this.resizeBar.selector;
+        }
+    }
+    setProps(props){
+        if(ut.isObject(props)){
+            this.setWindowProps(props.window)
+            this.setEditorProps(props.editor)
+            this.setPreviewProps(props.preview)
+            this.setResizeBarProps(props.resizeBar)
+        }
+    }
+
+    static getPaneStyle(size){
+        if(ut.isPositiveNumber(size)){
+            return {
+                width: `${size}px`,
+                visibility: 'visible'
+            }
+        }else if(ut.isNumber(size) && size === 0){
+            return{
+                visibility: 'hidden'
+            }
+        }else{
+            return null;
+        }
+
+    }
+
+    getOffsetWith(obj){
+        const element = document.querySelector(obj.selector)
+        return (this.isElement(element)) ? element.offsetWidth : null;
+    }
+
+    getOffsetLeft(obj){
+        const element = document.querySelector(obj.selector)
+        return (this.isElement(element)) ? element.offsetLeft : null;
+    }
+    getEditorWith(){
+       return this.editor.width;
+    }
+    setEditorWith(width){
+        if(ut.isNumber(width)){
+            this.editor.width = width
+            return true;
+        }
+        return false;
+    }
+    getEditorStyle(){
+        return PreviewerHelper.getPaneStyle(this.editor.width);
+    }
+
+    getPreviewWith(){
+        return this.preview.width;
+    }
+    setPreviewWith(width){
+        if(ut.isNumber(width)){
+            this.preview.width = width
+            return true;
+        }
+        return false;
+    }
+    getPreviewStyle(){
+        return PreviewerHelper.getPaneStyle(this.preview.width);
+    }
+
+    getResizeBarLeft(){
+        return this.resizeBar.left;
+    }
+    setResizeBarLeft(left){
+        if(ut.isNumber(left)){
+            this.resizeBar.left = left
+            return true;
+        }
+        return false;
+    }
+    getResizeBarStyle(){
+        const leftPos = this.resizeBar.left
+        if(ut.isNumber(leftPos) && leftPos >= 0){
+            return {
+                left: `${leftPos}`
+            };
+        }
+        return null;
+    }
+    getDataView(){
+        return {
+            left_w: this.getEditorWith(),
+            right_w: this.getPreviewWith(),
+            resizeBarLeft: this.getResizeBarLeft(),
+            nav_status: this.nav.status
+        }
+    }
+
+
+    getDataFromStorage(){
+        const storageData = DataStorage.getStoreData(this.storageKey);
+        if(ut.isObject(storageData)){
+            this.setComboSizes(storageData);
+        }
+    }
+
+    setDataToStorage(){
+        return DataStorage.setStoreData(
+            this.storageKey,
+            this.getDataView()
+        );
+    }
+    isWideWindow(minWidth, screenWidth){
+        return (
+            ut.isPositiveNumber(screenWidth)
+            && ut.isPositiveNumber(minWidth)
+            && screenWidth >= minWidth
+        )
+    }
+
+    setTypeWindow(){
+        this.window.isWide = this.isWideWindow(this.window.minWidth, window.innerWidth)
+        console.log(`[setResizerState] Resizer is ${this.window.isWide} - window width: ${this.window.minWidth} / ${window.innerWidth} :------------------------------------>`);
+        return this.window.isWide;
+    }
+
+    setMouseLeft(mouseLeft){
+        this.window.mouseLeft = (ut.isPositiveNumber(mouseLeft) ? mouseLeft : null);
+    }
+
+    isOnResize(){
+        return this.window.resizeStarted;
+    }
+
+    startResize(){
+        this.window.resizeStarted = true;
+    }
+
+    endResize(){
+        this.window.resizeStarted = false;
+        this.nav.status = this.COMBO_PANE;
+        this.setActiveNav('combo');
+        this.setDataToStorage();
+    }
+
+    /**
+     * Resize element width, and set visibility to hidden if width value is <= to zero.
+     * @param obj
+     * @param width
+     */
+    resizePane(obj, width) {
+        const element = document.querySelector(obj.selector)
+        if(ut.isPositiveNumber(width)){
+            element.style.visibility = `visible`;
+            element.style.width = `${width}px`;
+        }else{
+            element.style.width = `${0}`;
+            element.style.visibility = `hidden`;
+        }
+    }
+
+    setResizeBarPosition(obj, left){
+        const element = document.querySelector(obj.selector);
+        if(ut.isNumber(left)){
+            element.style.left = `${left}px`;
+        }
+    }
+
+    resetSizeStyle(obj){
+        const element = document.querySelector(obj.selector);
+        element.style = null;
+    }
+
+    resetAllSizeStyle(){
+        this.resetSizeStyle(this.editor)
+        this.resetSizeStyle(this.preview)
+        this.resetSizeStyle(this.resizeBar)
+    }
+
+    setDisplaySize(size){
+        const {left_w, right_w, resizeBarLeft} = size;
+        this.resizePane(this.editor, left_w);
+        this.resizePane(this.preview, right_w);
+        this.setResizeBarPosition(this.resizeBar, resizeBarLeft);
+    }
+
+    setComboSizes(size){
+        const {left_w, right_w, resizeBarLeft} = size;
+        this.setEditorWith(left_w);
+        this.setPreviewWith(right_w);
+        this.setResizeBarLeft(resizeBarLeft);
+    }
+    setDisplayAndSave(size){
+        this.setComboSizes(size)
+        this.setDisplaySize(size)
+    }
+    resizeWindows(){
+        const mouseX = this.window.mouseLeft,
+            left_x = this.getOffsetLeft(this.editor),
+            right_x = this.getOffsetLeft(this.preview),
+            right_w = this.getOffsetWith(this.preview),
+            window_w = window.innerWidth,
+            is_min_left = (mouseX >= this.editor.minWidth),
+            is_min_right = (mouseX <= window_w - this.preview.minWidth);
+        if(is_min_left && is_min_right ){
+            const left_res = mouseX - left_x,
+                right_res = ((right_x + right_w) - mouseX);
+            this.setDisplayAndSave({
+                left_w: left_res,
+                right_w:  right_res,
+                resizeBarLeft: mouseX
+            });
+        }
+    }
+
+    resetNavActive(){
+        document.querySelector(this.nav.left).classList.remove('active');
+        document.querySelector(this.nav.combo).classList.remove('active');
+        document.querySelector(this.nav.right).classList.remove('active');
+    }
+    setActiveNav(item){
+        this.resetNavActive();
+        switch (item){
+            case 'left':
+                document.querySelector(this.nav.left).classList.add('active');
+                break;
+            case 'combo':
+                document.querySelector(this.nav.combo).classList.add('active');
+                break;
+            case 'right':
+                document.querySelector(this.nav.right).classList.add('active');
+                break;
+            default:
+                document.querySelector(this.nav.combo).classList.add('active');
+                break;
+
+        }
+    }
+    expandEditor(){
+        this.setActiveNav('left');
+        if(this.window.isWide){
+            const windowWidth = window.innerWidth;
+            this.setDisplaySize({
+                left_w: windowWidth,
+                right_w:  0,
+                resizeBarLeft: windowWidth
+            });
+            this.nav.status = this.LEFT_PANE;
+        }else{
+            const left_pane = document.querySelector(this.editor.selector);
+            left_pane.style.display = '';
+            left_pane.style.width = '';
+            left_pane.style.visibility = '';
+            left_pane.style.height = "100vh";
+            document.querySelector(this.preview.selector).style.display = 'none';
+        }
+
+    }
+
+    expandPreview(){
+        this.setActiveNav('right');
+        if(this.window.isWide){
+            this.setDisplaySize({
+                left_w: 0,
+                right_w:  window.innerWidth,
+                resizeBarLeft: 0
+            });
+            this.nav.status = this.RIGHT_PANE;
+            this.setDataToStorage();
+        }else{
+            document.querySelector(this.editor.selector).style.display = 'none';
+            const right_pane = document.querySelector(this.preview.selector);
+            right_pane.style.display = '';
+            right_pane.style.width = '';
+            right_pane.style.visibility = '';
+            right_pane.style.height = "100vh";
+
+        }
+
+    }
+    hasComboDataView(){
+        return ut.isPositiveNumber(this.editor.width)
+            && ut.isPositiveNumber(this.preview.width)
+            && ut.isPositiveNumber(this.resizeBar.left)
+    }
+
+    loadComboView(){
+        this.getDataFromStorage();
+        if(this.window.isWide){
+            this.nav.status = this.COMBO_PANE;
+            const left_pane = document.querySelector(this.editor.selector);
+            left_pane.style.display = ''
+            left_pane.style.height = ''
+            const right_pane = document.querySelector(this.preview.selector);
+            right_pane.style.display = ''
+            right_pane.style.height = ''
+            if(this.hasComboDataView()){
+                this.setDisplaySize(this.getDataView());
+            }else{
+                const windowWidth = parseInt(window.innerWidth/2);
+                this.setDisplaySize({
+                    left_w: windowWidth,
+                    right_w:  windowWidth,
+                    resizeBarLeft: windowWidth
+                });
+            }
+
+            this.setActiveNav('combo');
+        }else{
+            switch(this.nav.type){
+                case this.LEFT_PANE:
+                    this.expandEditor();
+                    break;
+                case this.RIGHT_PANE:
+                    this.expandPreview();
+                    break;
+                default:
+                    this.expandEditor();
+                    break;
+            }
+        }
+    }
+
+    loadView(){
+
+    }
+
+    resizeView(){
+        const back = this.window.isWide
+        if(this.setTypeWindow() !== back){
+            switch(this.nav.type){
+                case this.LEFT_PANE:
+                    this.expandEditor();
+                    break;
+                case this.RIGHT_PANE:
+                    this.expandPreview();
+                    break;
+                case this.COMBO_PANE:
+                    this.loadComboView();
+                    break;
+                default:
+                    if(this.window.isWide){
+                        this.loadComboView();
+                    }else{
+                        this.expandEditor();
+                    }
+                    break;
+            }
+
+        }
+    }
+
+    ExpandWindow(element){
+        if(this.isElement(element)){
+            const controls = element.getAttribute('aria-controls');
+            const is_wide = this.window.isWide
+            if(this.setTypeWindow() !== is_wide){
+                this.resetAllSizeStyle();
+            }
+            switch(controls){
+                case 'm8_left_body':
+                    this.expandEditor();
+                    break;
+                case 'm8_right_body':
+                    this.expandPreview();
+                    break;
+                default:
+                    break;
+            }
+
+        }
+    }
+}
 /**
  * Sanitize html string with DOMPurify.js package.
  *
