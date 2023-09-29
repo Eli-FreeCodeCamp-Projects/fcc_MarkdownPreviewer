@@ -41,6 +41,7 @@ const refreshPreview = (data) => {
 const defaultState = {
     status: true,
     error_msg: '',
+    min_resize_width: 768,
     input_text: defaultInput,
     output_text: parse_markdown(defaultInput)
 };
@@ -55,6 +56,7 @@ const DataReducer = (state = defaultState, action) => {
             return {
                 status: true,
                 error_msg: '',
+                min_resize_width: state.min_resize_width,
                 input_text: action.input_text,
                 output_text: action.output_text
             };
@@ -63,6 +65,7 @@ const DataReducer = (state = defaultState, action) => {
             return {
                 status: true,
                 error_msg: '',
+                min_resize_width: state.min_resize_width,
                 input_text: '',
                 output_text: ''
             };
