@@ -32,9 +32,12 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     return {
         refreshPreview: (text) => {
-            console.log("Refresh Preview.");
-            console.log("Dispatch data length.");
-            console.log(text.length);
+            if(debug){
+                console.log("Refresh Preview.");
+                console.log("Dispatch data length.");
+                console.log(text.length);
+            }
+
             dispatch(refreshPreview(text));
         }
     }

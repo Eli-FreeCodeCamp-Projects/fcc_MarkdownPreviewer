@@ -292,7 +292,11 @@ class PreviewerHelper{
 
     setTypeWindow(){
         this.window.isWide = this.isWideWindow(this.window.minWidth, window.innerWidth)
-        console.log(`[setResizerState] Resizer is ${this.window.isWide} - window width: ${this.window.minWidth} / ${window.innerWidth} :------------------------------------>`);
+        if(debug) {
+            console.log(
+                `[setResizerState] Resizer is ${this.window.isWide} - window width: ${this.window.minWidth} / ${window.innerWidth} :------------------------------------>`
+            );
+        }
         return this.window.isWide;
     }
 

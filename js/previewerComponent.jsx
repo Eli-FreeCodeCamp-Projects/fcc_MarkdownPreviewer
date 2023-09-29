@@ -3,7 +3,9 @@
  * Output Component
  */
 function HtmlPreview({output_text}){
-    console.log("Render HtmlPreview Component.")
+    if(debug) {
+        console.log("Render HtmlPreview Component.")
+    }
     React.useEffect(() => {
         document.output_text = output_text
     }, [output_text]);
@@ -22,7 +24,9 @@ function HtmlPreview({output_text}){
  * Editor Component
  */
 function InputEditor({input_text, refreshPreview}){
-    console.log("Render InputEditor Component.")
+    if(debug) {
+        console.log("Render InputEditor Component.")
+    }
     const handleChange = (e) => {
         const value = e.target.value;
         refreshPreview(value)
@@ -111,8 +115,10 @@ function NavBar(props){
  *  - redux must be connected directly to child's ????
  */
 function ResizableWindows(props){
-    console.log("Render ResizableWindows Component.")
-    console.log(props);
+    if(debug) {
+        console.log("Render ResizableWindows Component.")
+        console.log(props);
+    }
 
     /**
      * Instantiate PreviewerHelper class.
@@ -142,12 +148,16 @@ function ResizableWindows(props){
      * componentWillUnmount is simulated by returning a function inside the useEffect hook.
      */
     React.useEffect(() => {
-        console.log(`Mount ResizableWindows Component :------------->`);
+        if(debug) {
+            console.log(`Mount ResizableWindows Component :------------->`);
+        }
         helper.getDataFromStorage();
         window.addEventListener('resize', handleResizeWindow)
         // returned function will be called on component unmount
         return () => {
-            console.log(`UnMount ResizableWindows Component :------------->`);
+            if(debug) {
+                console.log(`UnMount ResizableWindows Component :------------->`);
+            }
             window.removeEventListener('resize', handleResizeWindow)
         }
     }, []);
@@ -161,7 +171,9 @@ function ResizableWindows(props){
         // see :
         //  - https://bugzilla.mozilla.org/show_bug.cgi?id=568313
         //  - https://bugzilla.mozilla.org/show_bug.cgi?id=646823#c4
-        console.log(`handleDragStart :->`);
+        if(debug) {
+            console.log(`handleDragStart :->`);
+        }
         helper.startResize()
         e.dataTransfer.effectAllowed = 'none';
         // set invisible element to ghost drag image to hidden ghost image
@@ -180,12 +192,16 @@ function ResizableWindows(props){
      * @param e The react event handler
      */
     const handleDrag = (e) => {
-        console.log(`handleDrag :->`);
+        if(debug) {
+            console.log(`handleDrag :->`);
+        }
         helper.resizeWindows();
     }
 
     const handleDragEnd = (e) => {
-        console.log(`handleDragEnd :->`);
+        if(debug) {
+            console.log(`handleDragEnd :->`);
+        }
         helper.endResize();
 
         document.ondragover = null;
@@ -199,16 +215,22 @@ function ResizableWindows(props){
     }
 
     const handleExpandWindow = (e) => {
-        console.log(`handleExpandWindow ------------------------------------------->`);
+        if(debug) {
+            console.log(`handleExpandWindow ------------------------------------------->`);
+        }
         helper.ExpandWindow(e.target);
     }
     const handleComboView = (e) => {
-        console.log(`handleComboView ------------------------------------------->`);
+        if(debug) {
+            console.log(`handleComboView ------------------------------------------->`);
+        }
         helper.loadComboView();
     }
 
     const handleResizeWindow = (e) => {
-        console.log(`handleResizeWindow ------------------------------------------->`);
+        if(debug) {
+            console.log(`handleResizeWindow ------------------------------------------->`);
+        }
         helper.resizeView()
     }
 
@@ -277,17 +299,23 @@ function ResizableWindows(props){
 }
 
 function ResizableContainer(props){
-    console.log("Render ResizableContainer Component.");
+    if(debug) {
+        console.log("Render ResizableContainer Component.");
+    }
     const mounted = React.useRef();
     React.useEffect(() => {
         if (!mounted.current) {
             // do componentDidMount logic
             mounted.current = true;
-            console.log("componentDidMount");
-            console.log(mounted)
+            if(debug) {
+                console.log("componentDidMount");
+                console.log(mounted)
+            }
         } else {
             // do componentDidUpdate logic
-            console.log("componentDidUpdate");
+            if(debug) {
+                console.log("componentDidUpdate");
+            }
             return false;
         }
     }, [props.data.min_resize_width]);
