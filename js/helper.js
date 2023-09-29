@@ -146,13 +146,6 @@ class PreviewerHelper{
         this.setProps(props)
     }
 
-    isSelector(selector){
-        return ut.isStr(selector)
-    }
-    isElement(element){
-        return ut.isObject(element)
-    }
-
     getPaneStatus(){
         return this.nav.status
     }
@@ -163,19 +156,19 @@ class PreviewerHelper{
     }
     setEditorProps(props){
         if(ut.isObject(props)){
-            this.editor.selector = (this.isSelector(props.selector)) ? props.selector : this.editor.selector;
+            this.editor.selector = (ut.isSelector(props.selector)) ? props.selector : this.editor.selector;
             this.editor.minWidth = (ut.isNumber(props.minWidth)) ? props.minWidth : this.editor.minWidth;
         }
     }
     setPreviewProps(props){
         if(ut.isObject(props)){
-            this.preview.selector = (this.isSelector(props.selector)) ? props.selector : this.preview.selector;
+            this.preview.selector = (ut.isSelector(props.selector)) ? props.selector : this.preview.selector;
             this.preview.minWidth = (ut.isNumber(props.minWidth)) ? props.minWidth : this.preview.minWidth;
         }
     }
     setResizeBarProps(props){
         if(ut.isObject(props)){
-            this.resizeBar.selector = (this.isSelector(props.selector)) ? props.selector : this.resizeBar.selector;
+            this.resizeBar.selector = (ut.isSelector(props.selector)) ? props.selector : this.resizeBar.selector;
         }
     }
     setProps(props){
@@ -205,12 +198,12 @@ class PreviewerHelper{
 
     getOffsetWith(obj){
         const element = document.querySelector(obj.selector)
-        return (this.isElement(element)) ? element.offsetWidth : null;
+        return (ut.isElement(element)) ? element.offsetWidth : null;
     }
 
     getOffsetLeft(obj){
         const element = document.querySelector(obj.selector)
-        return (this.isElement(element)) ? element.offsetLeft : null;
+        return (ut.isElement(element)) ? element.offsetLeft : null;
     }
     getEditorWith(){
        return this.editor.width;
@@ -527,7 +520,7 @@ class PreviewerHelper{
     }
 
     ExpandWindow(element){
-        if(this.isElement(element)){
+        if(ut.isElement(element)){
             const controls = element.getAttribute('aria-controls');
             const is_wide = this.window.isWide
             if(this.setTypeWindow() !== is_wide){
@@ -636,6 +629,12 @@ const ut = {
     */
     isAttrKey: (value) => {
         return ut.isStr(value) && /(?=[a-zA-Z0-9\-_]{1,80}$)^([a-zA-Z0-9]+(?:(?:_|-)[a-zA-Z0-9]+)*)$/.test(value)
+    },
+    isSelector: (selector)=>{
+        return ut.isStr(selector)
+    },
+    isElement: (element)=>{
+        return ut.isObject(element)
     }
 
 }
