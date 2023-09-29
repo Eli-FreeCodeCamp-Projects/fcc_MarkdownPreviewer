@@ -582,6 +582,9 @@ const resizePane = (element, newWidth) => {
  * @type {{isObject: (function(*): *), isNumber: (function(*): *), isPositiveNumber: (function(*): *), isArray: (function(*): arg is any[]), isStr: (function(*): *)}}
  */
 const ut = {
+    toFixedFloat: (fNum) => {
+        return parseFloat(fNum.toFixed(1));
+    },
     isObject: (value) => {
         return typeof value === 'object' && !Array.isArray(value) && value !== null
     },
@@ -596,31 +599,21 @@ const ut = {
     },
     isStr: (value) => {
         return (typeof value === 'string' || value instanceof String)
+    },
+    /*
+    * Test if value is valid key.
+    *
+    */
+    isKey: (value) => {
+        return ut.isStr(value) && /(?=\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$/.test(value)
+    },
+
+    /*
+    * Test if value is valid attribute key.
+    *
+    */
+    isAttrKey: (value) => {
+        return ut.isStr(value) && /(?=[a-zA-Z0-9\-_]{1,80}$)^([a-zA-Z0-9]+(?:(?:_|-)[a-zA-Z0-9]+)*)$/.test(value)
     }
+
 }
-
-
-const defaultInput = "# Title 1\n" +
-    "\n" +
-    "Some text with inline code ``<div</div>``.\n" +
-    "## Title 2   \n" +
-    "[Github acount](https://github.com/mano8)\n" +
-    "Here is a code block example:\n" +
-    "```\n" +
-    "<h1>Title 1</h1> \n" +
-    "<h2>Title 2</h2> \n" +
-    "```\n" +
-    "Here is a list example:\n" +
-    " - Item 1\n" +
-    " - Item 2\n" +
-    " - Item 3\n" +
-    " - Item 4\n" +
-    "  \n" +
-    "Here is a blockquote example:\n" +
-    "> Hello World !!!\n" +
-    "You can also make text **bold**... whoa!\n" +
-    "Or _italic_.\n" +
-    "Or... wait for it... **_both!_**\n" +
-    "\n" +
-    "\n" +
-    "![freeCodeCamp Logo](https://cdn.freecodecamp.org/testable-projects-fcc/images/fcc_secondary.svg)\n";
