@@ -30,7 +30,14 @@ header{
   }
 }
 
-
+button i{
+  pointer-events: none; // add this line
+}
+.nav-resizable{
+  .combo-expand{
+    display: none;
+  }
+}
 #previewer{
   .card-header h2{
     font-size: 1.1em;
@@ -38,12 +45,17 @@ header{
   }
   .editor-container{
     width: 100%;
-    height: 300px;
+    height: 50vh;
     h2{
 
     }
+    .card, .form-floating, .container-fluid, #editor{
+      height: 100%;
+      width: 100%;
+    }
     #editor{
-      min-height: 300px;
+      height: 100%;
+      width: 100%;
     }
   }
   .size-container{
@@ -68,6 +80,7 @@ header{
     padding: 5px 10px;
     background-color: $background-color-code;
     border-radius: 10px;
+    color: $text-color-main
   }
   pre > code{
     display: inline-block;
@@ -82,6 +95,12 @@ header{
 }
 
 @media only screen and (min-width: 768px){
+
+  .nav-resizable{
+    .combo-expand{
+      display: inherit;
+    }
+  }
   #previewer{
     .editor-container{
       width: 50%;
@@ -103,11 +122,11 @@ header{
       background-color: linen;
       cursor: move;
       button{
-        position: fixed;
+        position: relative;
         top: 50%;
         width: 40px;
         height: 30px;
-        font-size: 1.5em;
+        font-size: 1.2em;
         z-index: 1;
         background-color: $background-color-main;
         padding: 0;
