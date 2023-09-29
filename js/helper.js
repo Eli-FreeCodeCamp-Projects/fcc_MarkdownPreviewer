@@ -1,7 +1,89 @@
 /**
  * Helper functions
  */
-const debug = true;
+const debug = true,
+    defaultInput = "# Title 1\n" +
+        "\n" +
+        "Some text with inline code ``<div</div>``.\n" +
+        "## Title 2   \n" +
+        "[Github acount](https://github.com/mano8)\n" +
+        "Here is a code block example:\n" +
+        "```\n" +
+        "<h1>Title 1</h1> \n" +
+        "<h2>Title 2</h2> \n" +
+        "```\n" +
+        "Here is a list example:\n" +
+        " - Item 1\n" +
+        " - Item 2\n" +
+        " - Item 3\n" +
+        " - Item 4\n" +
+        "  \n" +
+        "Here is a blockquote example:\n" +
+        "> Hello World !!!\n" +
+        "You can also make text **bold**... whoa!\n" +
+        "Or _italic_.\n" +
+        "Or... wait for it... **_both!_**\n" +
+        "\n" +
+        "\n" +
+        "![freeCodeCamp Logo](https://cdn.freecodecamp.org/testable-projects-fcc/images/fcc_secondary.svg)\n",
+    SESSION_STORAGE = "SESSION_STORAGE",
+    LOCAL_STORAGE = "LOCAL_STORAGE";
+
+/**
+ * Data Storage Helper class
+ * Used to load and save data from localStorage and/or sessionStorage
+ */
+class DataStorage{
+    static SESSION_STORAGE = "SESSION_STORAGE"
+    static LOCAL_STORAGE = "LOCAL_STORAGE"
+
+    static isStoreKey(key){
+        if(! ut.isAttrKey(key)){
+            return new Error(`Unable to get store data. Data key is invalid.`)
+        }
+        return true;
+    }
+    static getStore(storage){
+        switch(storage){
+            case DataStorage.SESSION_STORAGE:
+                return sessionStorage;
+            case DataStorage.LOCAL_STORAGE:
+                return localStorage;
+            default:
+                return new Error(`Invalid Storage type. Can be SESSION_STORAGE or LOCAL_STORAGE`);
+        }
+    }
+    /**
+     * Get Data from selected storage (localStorage or sessionStorage)
+     * @return {*|null}
+     */
+    static getStoreData(key, storage= DataStorage.LOCAL_STORAGE){
+        DataStorage.isStoreKey(key);
+        const store = DataStorage.getStore(storage);
+        let storageData = store.getItem("m8Prv_sizes");
+        if(ut.isStr(storageData)){
+            storageData = JSON.parse(storageData);
+        }
+        return (ut.isObject(storageData)) ? storageData : null;
+    }
+
+    /**
+     * Save Data on selected storage (localStorage or sessionStorage)
+     * @param data
+     * @param key
+     * @param storage
+     */
+    static setStoreData(key, data, storage= DataStorage.LOCAL_STORAGE) {
+        DataStorage.isStoreKey(key);
+        const store = DataStorage.getStore(storage);
+        if(!ut.isObject(data)){
+            return new Error(`Unable to set storage data. Data must be a valid object.`)
+        }
+        store.setItem("m8Prv_sizes", JSON.stringify(data));
+        return true;
+    }
+}
+
 
 /**
  * Sanitize html string with DOMPurify.js package.
