@@ -52,7 +52,7 @@ class DataStorage{
      * Select data storage to use.
      * Can be sessionStorage or localStorage
      * @param storage the storage name to use.
-     * @return {any}
+     * @return {Error|any}
      */
     static getStore(storage){
         switch(storage){
@@ -100,92 +100,130 @@ class DataStorage{
     }
 }
 
+/**
+ *
+ */
+class ResizableBase{
 
-class PreviewerHelper{
     COMBO_PANE = 'COMBO_PANE'
     LEFT_PANE = 'LEFT_PANE'
     RIGHT_PANE = 'RIGHT_PANE'
-    DISPLAY_VERTICAL = 'DISPLAY_VERTICAL';
-    DISPLAY_HORIZONTAL = 'DISPLAY_HORIZONTAL';
 
+    /**
+     *
+     * @param selector
+     * @param defaultValue
+     * @return {*|null}
+     */
+    static setSelector(selector, defaultValue= null){
+        const def = (ut.isSelector(defaultValue)) ? defaultValue : null;
+        return (ut.isSelector(selector)) ? selector : def;
+    }
+
+    /**
+     *
+     * @param value
+     * @return {*|boolean}
+     */
+    static isDimValue(value){
+        return ut.isNumber(value) && value >= 0;
+    }
+
+    /**
+     *
+     * @param value
+     * @param defaultValue
+     * @return {*|null}
+     */
+    static setDimValue(value, defaultValue= null){
+        const def = (ResizableBase.isDimValue(defaultValue)) ? defaultValue : null;
+        return (ResizableBase.isDimValue(value)) ? value : def;
+    }
+
+    /**
+     *
+     * @param selector
+     * @return {number|null}
+     */
+    getOffsetWith(selector){
+        const element = document.querySelector(selector)
+        return (ut.isElement(element)) ? element.offsetWidth : null;
+    }
+
+    /**
+     *
+     * @param selector
+     * @return {number|null}
+     */
+    getOffsetLeft(selector){
+        const element = document.querySelector(selector)
+        return (ut.isElement(element)) ? element.offsetLeft : null;
+    }
+}
+/**
+ * SidePane class
+ */
+class SidePane extends ResizableBase{
     constructor(props){
-        this.storageKey = "m8Prv_sizes";
-        this.window = {
-            minWidth: 768,
-            isWide: true,
-            resizeStarted: false,
-            mouseLeft: 0,
-            width: null
-        };
-        this.nav = {
-            left: '#m8-left-expand',
-            combo: '#m8-expand-combo',
-            right: '#m8-right-expand',
-            status: this.COMBO_PANE
-        }
-        this.editor = {
-            selector: '#previewer .editor-container',
-            nav: '#m8-left-expand',
-            width: null,
-            left: null,
-            minWidth: 150
-        };
-        this.preview = {
-            selector: '#previewer .preview-container',
-            nav: '#m8-right-expand',
-            width: null,
-            left: null,
-            minWidth: 150
-        };
-        this.resizeBar = {
-            selector:  '#previewer .size-container',
-            left: null
-        };
-        this.setProps(props)
+        super();
+        this.selector = null;
+        this.width = null;
+        this.minWidth = 300;
+        this.setProps(props);
     }
 
-    getPaneStatus(){
-        return this.nav.status
-    }
-    setWindowProps(props){
-        if(ut.isObject(props) && ut.isPositiveNumber(props.minWidth)){
-            this.window.minWidth = props.minWidth
-        }
-    }
-    setEditorProps(props){
-        if(ut.isObject(props)){
-            this.editor.selector = (ut.isSelector(props.selector)) ? props.selector : this.editor.selector;
-            this.editor.minWidth = (ut.isNumber(props.minWidth)) ? props.minWidth : this.editor.minWidth;
-        }
-    }
-    setPreviewProps(props){
-        if(ut.isObject(props)){
-            this.preview.selector = (ut.isSelector(props.selector)) ? props.selector : this.preview.selector;
-            this.preview.minWidth = (ut.isNumber(props.minWidth)) ? props.minWidth : this.preview.minWidth;
-        }
-    }
-    setResizeBarProps(props){
-        if(ut.isObject(props)){
-            this.resizeBar.selector = (ut.isSelector(props.selector)) ? props.selector : this.resizeBar.selector;
-        }
-    }
+    /**
+     *
+     * @param props
+     */
     setProps(props){
         if(ut.isObject(props)){
-            this.setWindowProps(props.window)
-            this.setEditorProps(props.editor)
-            this.setPreviewProps(props.preview)
-            this.setResizeBarProps(props.resizeBar)
+            this.setSelector(props.selector)
+            this.setMinWidth(props.minWidth);
         }
     }
 
-    static getPaneStyle(size){
-        if(ut.isPositiveNumber(size)){
+    /**
+     *
+     * @return {boolean|*}
+     */
+    isReady(){
+        return ut.isSelector(this.selector)
+    }
+
+    /**
+     *
+     * @param value
+     */
+    setMinWidth(value){
+        this.minWidth = SidePane.setDimValue(value, 300);
+    }
+
+    /**
+     *
+     * @param value
+     */
+    setSelector(value){
+        this.selector = SidePane.setSelector(value);
+    }
+
+    getElement(){
+        return document.querySelector(this.selector);
+    }
+
+    /**
+     *
+     * @param width
+     * @return {{visibility: string, width: string}|{visibility: string}|null}
+     */
+    static getPaneStyle(width){
+        if(ut.isPositiveNumber(width)){
             return {
-                width: `${size}px`,
+                width: `${width}px`,
                 visibility: 'visible'
             }
-        }else if(ut.isNumber(size) && size === 0){
-            return{
+        }else if(ut.isNumber(width) && width === 0){
+            return {
                 visibility: 'hidden'
             }
         }else{
@@ -194,105 +232,424 @@ class PreviewerHelper{
 
     }
 
-    getOffsetWith(obj){
-        const element = document.querySelector(obj.selector)
-        return (ut.isElement(element)) ? element.offsetWidth : null;
+    /**
+     *
+     * @param width
+     * @return {*|boolean}
+     */
+    static isWidth(width){
+        return SidePane.isDimValue(width);
     }
 
-    getOffsetLeft(obj){
-        const element = document.querySelector(obj.selector)
-        return (ut.isElement(element)) ? element.offsetLeft : null;
-    }
-    getEditorWith(){
-       return this.editor.width;
-    }
-    setEditorWith(width){
-        if(ut.isNumber(width)){
-            this.editor.width = width
+    /**
+     *
+     * @param width
+     * @return {boolean}
+     */
+    setWidth(width){
+        if(SidePane.isWidth(width)){
+            this.width = width
             return true;
         }
         return false;
     }
-    getEditorStyle(){
-        return PreviewerHelper.getPaneStyle(this.editor.width);
+
+    /**
+     *
+     * @return {{visibility: string, width: string}|{visibility: string}}
+     */
+    getStyle(){
+        return SidePane.getPaneStyle(this.width);
     }
 
-    getPreviewWith(){
-        return this.preview.width;
-    }
-    setPreviewWith(width){
-        if(ut.isNumber(width)){
-            this.preview.width = width
-            return true;
+    /**
+     *
+     * @return {null}
+     */
+    resizePane(width){
+        const element = this.getElement();
+        if(ut.isPositiveNumber(width)){
+            element.style.visibility = '';
+            element.style.width = `${width}px`;
+        }else{
+            element.style.width = `${0}`;
+            element.style.visibility = `hidden`;
         }
-        return false;
-    }
-    getPreviewStyle(){
-        return PreviewerHelper.getPaneStyle(this.preview.width);
     }
 
-    getResizeBarLeft(){
-        return this.resizeBar.left;
+    /**
+     *
+     */
+    resetStyle(){
+        const element = this.getElement()
+        element.style.width = '';
+        element.style.visibility = '';
+        element.style.height = '';
+        element.style.display = '';
     }
-    setResizeBarLeft(left){
+}
+
+/**
+ *
+ */
+class ResizeBar extends ResizableBase{
+    constructor(props){
+        super()
+        this.selector = null;
+        this.left = null;
+
+        this.setProps(props);
+    }
+
+    setSelector(value){
+        this.selector = ResizeBar.setSelector(value);
+    }
+
+    getElement(){
+        return document.querySelector(this.selector);
+    }
+
+    setProps(props){
+        if(ut.isObject(props)){
+            this.setSelector(props.selector);
+        }
+    }
+
+    isReady(){
+        return ut.isSelector(this.selector)
+    }
+
+    isLeftValue(left){
+        return ResizeBar.isDimValue(left);
+    }
+    setLeft(left){
         if(ut.isNumber(left)){
-            this.resizeBar.left = left
+            this.left = left;
             return true;
         }
         return false;
     }
-    getResizeBarStyle(){
-        const leftPos = this.resizeBar.left
-        if(ut.isNumber(leftPos) && leftPos >= 0){
+
+    getStyle(){
+        if(this.isLeftValue(this.left)){
             return {
-                left: `${leftPos}`
+                left: `${this.left}px`
             };
         }
         return null;
     }
-    getDataView(){
-        return {
-            left_w: this.getEditorWith(),
-            right_w: this.getPreviewWith(),
-            resizeBarLeft: this.getResizeBarLeft(),
-            nav_status: this.nav.status
+
+    setLeftPosition(){
+        if(this.isLeftValue(this.left)){
+            const element = this.getElement()
+            element.style.left = `${this.left}px`;
+            return true;
+        }
+        return null;
+    }
+
+    resetStyle(){
+        document.querySelector(this.selector).style.left = '';
+    }
+}
+
+/**
+ *
+ */
+class PreviewerNav extends ResizableBase{
+
+    constructor(props){
+        super();
+        this.btLeft = null;
+        this.btCombo = null;
+        this.btRight = null;
+        this.status = this.COMBO_PANE
+
+        this.setProps(props);
+    }
+
+    setBtLeft(value){
+        this.btLeft = PreviewerNav.setSelector(value);
+    }
+
+    setBtCombo(value){
+        this.btCombo = PreviewerNav.setSelector(value);
+    }
+
+    setBtRight(value){
+        this.btRight = PreviewerNav.setSelector(value);
+    }
+
+    isNavStatus(value){
+        return value === this.LEFT_PANE || this.COMBO_PANE  || this.RIGHT_PANE
+    }
+
+    setNavStatus(value){
+        this.status = (this.isNavStatus(value)) ? value : this.COMBO_PANE;
+    }
+
+    setProps(props){
+        if(ut.isObject(props)){
+            this.setBtLeft(props.btLeft);
+            this.setBtCombo(props.btCombo);
+            this.setBtRight(props.btRight);
+            this.setNavStatus(props.status);
         }
     }
 
+    initFromStatus(){
+        switch (this.status){
+            case this.LEFT_PANE:
+                this.setBtLeftActive();
+                break;
+            case this.COMBO_PANE:
+                this.setBtComboActive();
+                break;
+            case this.RIGHT_PANE:
+                this.setBtRightActive();
+                break;
+        }
+    }
+
+    isReady(){
+        return ut.isSelector(this.btLeft)
+            && ut.isSelector(this.btCombo)
+            && ut.isSelector(this.btRight)
+            && this.isNavStatus(this.status)
+    }
+
+    resetNavActive(){
+        document.querySelector(this.btLeft).classList.remove('active');
+        document.querySelector(this.btCombo).classList.remove('active');
+        document.querySelector(this.btRight).classList.remove('active');
+    }
+
+    isBtLeftActive(){
+        return document.querySelector(this.btLeft).classList.contains('active');
+    }
+
+    setBtLeftActive(){
+        if(!this.isBtLeftActive()) {
+            this.resetNavActive();
+            this.status = this.LEFT_PANE;
+            document.querySelector(this.btLeft).classList.add('active');
+        }
+    }
+
+    isBtComboActive(){
+        return document.querySelector(this.btCombo).classList.contains('active');
+    }
+
+    setBtComboActive(){
+        if(!this.isBtComboActive()) {
+            this.resetNavActive();
+            this.status = this.COMBO_PANE;
+            document.querySelector(this.btCombo).classList.add('active');
+        }
+    }
+
+    isBtRightActive(){
+        return document.querySelector(this.btRight).classList.contains('active');
+    }
+
+    setBtRightActive(){
+        if(!this.isBtRightActive()){
+            this.resetNavActive();
+            this.status = this.RIGHT_PANE;
+            document.querySelector(this.btRight).classList.add('active');
+        }
+
+    }
+}
+
+class PreviewerWindow extends ResizableBase{
+    constructor(props){
+        super();
+        this.minWidth = null;
+        this.isWide = true;
+        this.resizeStarted = false;
+        this.mouseLeft = 0
+        this.width = 0
+
+        this.setProps(props);
+    }
+
+    setProps(props){
+        if(ut.isObject(props)){
+            this.setMinWidth(props.minWidth);
+        }
+    }
+
+    setMinWidth(value){
+        this.minWidth = PreviewerWindow.setDimValue(value);
+    }
+
+    isReady(){
+        return PreviewerWindow.isDimValue(this.minWidth)
+    }
+
+    isWideWindow(screenWidth){
+        return (
+            ut.isPositiveNumber(screenWidth)
+            && screenWidth >= this.minWidth
+        )
+    }
+
+    setTypeWindow(){
+        this.isWide = this.isWideWindow(window.innerWidth)
+        if(debug) {
+            console.log(
+                `[setResizerState] Resizer is ${this.isWide} - window width: ${this.minWidth} / ${window.innerWidth} :------------------------------------>`
+            );
+        }
+        return this.isWide;
+    }
+
+    setMouseLeft(mouseLeft){
+        this.mouseLeft = (ut.isPositiveNumber(mouseLeft) ? mouseLeft : null);
+    }
+}
+
+/**
+ * PreviewerHelper class
+ * This class is used to resize previewer windows.
+ */
+
+class ResizableHelper extends ResizableBase{
+    storageKey = null;
+    window = null;
+    nav = null;
+    leftPane = null;
+    rightPane = null;
+    resizeBar = null;
+    constructor(props){
+        super()
+        this.setProps(props);
+        this.getDataFromStorage();
+    }
+
+
+    setWindow(props){
+        this.window = new PreviewerWindow(props);
+    }
+
+    setNav(props){
+        this.nav = new PreviewerNav(props);
+    }
+
+    setLeftPane(props){
+        this.leftPane = new SidePane(props);
+    }
+
+    setRightPane(props){
+        this.rightPane = new SidePane(props);
+    }
+
+    setResizeBar(props){
+        this.resizeBar = new ResizeBar(props);
+    }
+
+    setProps(props){
+        if(ut.isObject(props)){
+            this.setWindow(props.window);
+            this.setNav(props.nav);
+            this.setLeftPane(props.leftPane);
+            this.setRightPane(props.rightPane);
+            this.setResizeBar(props.resizeBar);
+        }
+    }
+
+    isReady(){
+        return this.window.isReady()
+            && this.nav.isReady()
+            && this.leftPane.isReady()
+            && this.rightPane.isReady()
+            && this.resizeBar.isReady()
+    }
 
     getDataFromStorage(){
         const storageData = DataStorage.getStoreData(this.storageKey);
         if(ut.isObject(storageData)){
-            this.setComboSizes(storageData);
+            this.setPanesSize(storageData);
+            this.nav.setNavStatus(storageData.nav)
         }
     }
 
     setDataToStorage(){
         return DataStorage.setStoreData(
             this.storageKey,
-            this.getDataView()
+            this.getDataState()
         );
     }
-    isWideWindow(minWidth, screenWidth){
-        return (
-            ut.isPositiveNumber(screenWidth)
-            && ut.isPositiveNumber(minWidth)
-            && screenWidth >= minWidth
-        )
-    }
 
-    setTypeWindow(){
-        this.window.isWide = this.isWideWindow(this.window.minWidth, window.innerWidth)
-        if(debug) {
-            console.log(
-                `[setResizerState] Resizer is ${this.window.isWide} - window width: ${this.window.minWidth} / ${window.innerWidth} :------------------------------------>`
-            );
+    getDataState(){
+        return {
+            left_w: this.leftPane.width,
+            right_w: this.rightPane.width,
+            resizeBarLeft: this.resizeBar.left,
+            nav: this.nav.status,
         }
-        return this.window.isWide;
     }
 
-    setMouseLeft(mouseLeft){
-        this.window.mouseLeft = (ut.isPositiveNumber(mouseLeft) ? mouseLeft : null);
+    getPanesSize(){
+        return {
+            left_w: this.leftPane.width,
+            right_w: this.rightPane.width,
+            resizeBarLeft: this.resizeBar.left,
+        }
+    }
+
+    setPanesSize(size){
+        const {left_w, right_w, resizeBarLeft} = size;
+        this.leftPane.setWidth(left_w);
+        this.rightPane.setWidth(right_w);
+        this.resizeBar.setLeft(resizeBarLeft);
+    }
+
+    resizePanes(size){
+        const {left_w, right_w, resizeBarLeft} = size;
+        this.leftPane.resizePane(left_w);
+        this.rightPane.resizePane(right_w);
+        this.resizeBar.setLeftPosition(resizeBarLeft);
+    }
+
+    setAndResizePanes(size){
+        this.setPanesSize(size)
+        this.resizePanes(size)
+    }
+
+    getOffsetWith(element){
+        return (ut.isElement(element)) ? element.offsetWidth : null;
+    }
+
+    getOffsetLeft(element){
+        return (ut.isElement(element)) ? element.offsetLeft : null;
+    }
+
+    resetWindowsSizes(){
+        this.leftPane.resetStyle();
+        this.rightPane.resetStyle();
+        this.resizeBar.resetStyle();
+    }
+
+    handleResizeWindow(){
+        const mouseX = this.window.mouseLeft,
+            left_x = this.getOffsetLeft(this.leftPane.getElement()),
+            right_x = this.getOffsetLeft(this.rightPane.getElement()),
+            right_w = this.getOffsetWith(this.resizeBar.getElement()),
+            window_w = window.innerWidth,
+            is_min_left = (mouseX >= this.leftPane.minWidth),
+            is_min_right = (mouseX <= window_w - this.rightPane.minWidth);
+
+        if(is_min_left && is_min_right ){
+            const left_res = mouseX - left_x,
+                right_res = ((right_x + right_w) - mouseX);
+            this.setAndResizePanes({
+                left_w: left_res,
+                right_w:  right_res,
+                resizeBarLeft: mouseX
+            });
+        }
     }
 
     isOnResize(){
@@ -305,215 +662,123 @@ class PreviewerHelper{
 
     endResize(){
         this.window.resizeStarted = false;
-        this.nav.status = this.COMBO_PANE;
-        this.setActiveNav('combo');
+        this.nav.setBtComboActive();
         this.setDataToStorage();
     }
-
-    /**
-     * Resize element width, and set visibility to hidden if width value is <= to zero.
-     * @param obj
-     * @param width
-     */
-    resizePane(obj, width) {
-        const element = document.querySelector(obj.selector)
-        if(ut.isPositiveNumber(width)){
-            element.style.visibility = `visible`;
-            element.style.width = `${width}px`;
-        }else{
-            element.style.width = `${0}`;
-            element.style.visibility = `hidden`;
-        }
+    setMouseLeft(mouseLeft){
+        this.window.setMouseLeft(mouseLeft);
     }
 
-    setResizeBarPosition(obj, left){
-        const element = document.querySelector(obj.selector);
-        if(ut.isNumber(left)){
-            element.style.left = `${left}px`;
-        }
+    getLeftPaneStyle(){
+        return this.leftPane.getStyle();
     }
 
-    resetSizeStyle(obj){
-        const element = document.querySelector(obj.selector);
-        element.style = null;
+    getRightPaneStyle(){
+        return this.rightPane.getStyle();
     }
 
-    resetAllSizeStyle(){
-        this.resetSizeStyle(this.editor)
-        this.resetSizeStyle(this.preview)
-        this.resetSizeStyle(this.resizeBar)
+    getResizeBarStyle(){
+        return this.resizeBar.getStyle();
     }
 
-    setDisplaySize(size){
-        const {left_w, right_w, resizeBarLeft} = size;
-        this.resizePane(this.editor, left_w);
-        this.resizePane(this.preview, right_w);
-        this.setResizeBarPosition(this.resizeBar, resizeBarLeft);
-    }
-
-    setComboSizes(size){
-        const {left_w, right_w, resizeBarLeft} = size;
-        this.setEditorWith(left_w);
-        this.setPreviewWith(right_w);
-        this.setResizeBarLeft(resizeBarLeft);
-    }
-    setDisplayAndSave(size){
-        this.setComboSizes(size)
-        this.setDisplaySize(size)
-    }
-    resizeWindows(){
-        const mouseX = this.window.mouseLeft,
-            left_x = this.getOffsetLeft(this.editor),
-            right_x = this.getOffsetLeft(this.preview),
-            right_w = this.getOffsetWith(this.preview),
-            window_w = window.innerWidth,
-            is_min_left = (mouseX >= this.editor.minWidth),
-            is_min_right = (mouseX <= window_w - this.preview.minWidth);
-        if(is_min_left && is_min_right ){
-            const left_res = mouseX - left_x,
-                right_res = ((right_x + right_w) - mouseX);
-            this.setDisplayAndSave({
-                left_w: left_res,
-                right_w:  right_res,
-                resizeBarLeft: mouseX
-            });
-        }
-    }
-
-    resetNavActive(){
-        document.querySelector(this.nav.left).classList.remove('active');
-        document.querySelector(this.nav.combo).classList.remove('active');
-        document.querySelector(this.nav.right).classList.remove('active');
-    }
-    setActiveNav(item){
-        this.resetNavActive();
-        switch (item){
-            case 'left':
-                document.querySelector(this.nav.left).classList.add('active');
-                break;
-            case 'combo':
-                document.querySelector(this.nav.combo).classList.add('active');
-                break;
-            case 'right':
-                document.querySelector(this.nav.right).classList.add('active');
-                break;
-            default:
-                document.querySelector(this.nav.combo).classList.add('active');
-                break;
-
-        }
-    }
-    expandEditor(){
-        this.setActiveNav('left');
+    expandLeftPane(){
+        this.nav.setBtLeftActive();
+        this.resetWindowsSizes();
         if(this.window.isWide){
             const windowWidth = window.innerWidth;
-            this.setDisplaySize({
+            this.resizePanes({
                 left_w: windowWidth,
                 right_w:  0,
                 resizeBarLeft: windowWidth
             });
-            this.nav.status = this.LEFT_PANE;
         }else{
-            const left_pane = document.querySelector(this.editor.selector);
-            left_pane.style.display = '';
-            left_pane.style.width = '';
-            left_pane.style.visibility = '';
-            left_pane.style.height = "100vh";
-            document.querySelector(this.preview.selector).style.display = 'none';
-        }
+            const left_pane = this.leftPane.getElement(),
+                right_pane = this.rightPane.getElement();
 
+            left_pane.style.height = "100vh";
+            right_pane.style.display = 'none';
+        }
+        this.setDataToStorage();
     }
 
-    expandPreview(){
-        this.setActiveNav('right');
+    expandRightPane(){
+        this.nav.setBtRightActive();
+        this.resetWindowsSizes();
         if(this.window.isWide){
-            this.setDisplaySize({
+            this.resizePanes({
                 left_w: 0,
                 right_w:  window.innerWidth,
                 resizeBarLeft: 0
             });
-            this.nav.status = this.RIGHT_PANE;
-            this.setDataToStorage();
         }else{
-            document.querySelector(this.editor.selector).style.display = 'none';
-            const right_pane = document.querySelector(this.preview.selector);
-            right_pane.style.display = '';
-            right_pane.style.width = '';
-            right_pane.style.visibility = '';
+            const left_pane = this.leftPane.getElement(),
+                right_pane = this.rightPane.getElement();
             right_pane.style.height = "100vh";
-
+            left_pane.style.display = 'none';
         }
-
+        this.setDataToStorage();
     }
+
     hasComboDataView(){
-        return ut.isPositiveNumber(this.editor.width)
-            && ut.isPositiveNumber(this.preview.width)
+        return ut.isPositiveNumber(this.leftPane.width)
+            && ut.isPositiveNumber(this.rightPane.width)
             && ut.isPositiveNumber(this.resizeBar.left)
     }
 
     loadComboView(){
         this.getDataFromStorage();
         if(this.window.isWide){
-            this.nav.status = this.COMBO_PANE;
-            const left_pane = document.querySelector(this.editor.selector);
-            left_pane.style.display = ''
-            left_pane.style.height = ''
-            const right_pane = document.querySelector(this.preview.selector);
-            right_pane.style.display = ''
-            right_pane.style.height = ''
+            this.nav.setBtComboActive();
+            this.resetWindowsSizes();
             if(this.hasComboDataView()){
-                this.setDisplaySize(this.getDataView());
+                this.resizePanes(this.getPanesSize());
+
             }else{
                 const windowWidth = parseInt(window.innerWidth/2);
-                this.setDisplaySize({
+                this.setAndResizePanes({
                     left_w: windowWidth,
                     right_w:  windowWidth,
                     resizeBarLeft: windowWidth
                 });
             }
 
-            this.setActiveNav('combo');
         }else{
-            switch(this.nav.type){
-                case this.LEFT_PANE:
-                    this.expandEditor();
-                    break;
+            switch(this.nav.status){
                 case this.RIGHT_PANE:
-                    this.expandPreview();
+                    this.expandRightPane();
                     break;
                 default:
-                    this.expandEditor();
+                    this.expandLeftPane();
                     break;
             }
         }
     }
 
     loadView(){
-
+        switch(this.nav.status){
+            case this.LEFT_PANE:
+                this.expandLeftPane();
+                break;
+            case this.RIGHT_PANE:
+                this.expandRightPane();
+                break;
+            case this.COMBO_PANE:
+                this.loadComboView();
+                break;
+            default:
+                if(this.window.isWide){
+                    this.loadComboView();
+                }else{
+                    this.expandLeftPane();
+                }
+                break;
+        }
     }
 
     resizeView(){
         const back = this.window.isWide
-        if(this.setTypeWindow() !== back){
-            switch(this.nav.type){
-                case this.LEFT_PANE:
-                    this.expandEditor();
-                    break;
-                case this.RIGHT_PANE:
-                    this.expandPreview();
-                    break;
-                case this.COMBO_PANE:
-                    this.loadComboView();
-                    break;
-                default:
-                    if(this.window.isWide){
-                        this.loadComboView();
-                    }else{
-                        this.expandEditor();
-                    }
-                    break;
-            }
-
+        if(this.window.setTypeWindow() !== back){
+            this.loadView();
         }
     }
 
@@ -521,15 +786,15 @@ class PreviewerHelper{
         if(ut.isElement(element)){
             const controls = element.getAttribute('aria-controls');
             const is_wide = this.window.isWide
-            if(this.setTypeWindow() !== is_wide){
-                this.resetAllSizeStyle();
+            if(this.window.setTypeWindow() !== is_wide){
+                this.resetWindowsSizes();
             }
             switch(controls){
                 case 'm8_left_body':
-                    this.expandEditor();
+                    this.expandLeftPane();
                     break;
                 case 'm8_right_body':
-                    this.expandPreview();
+                    this.expandRightPane();
                     break;
                 default:
                     break;
@@ -537,7 +802,9 @@ class PreviewerHelper{
 
         }
     }
+
 }
+
 /**
  * Sanitize html string with DOMPurify.js package.
  *
@@ -626,10 +893,18 @@ const ut = {
     *
     */
     isAttrKey: (value) => {
-        return ut.isStr(value) && /(?=[a-zA-Z0-9\-_]{1,80}$)^([a-zA-Z0-9]+(?:(?:_|-)[a-zA-Z0-9]+)*)$/.test(value)
+        return ut.isStr(value) && /(?=[a-zA-Z0-9\-_]{1,80}$)^([a-zA-Z0-9]+(?:[_\-][a-zA-Z0-9]+)*)$/.test(value)
+    },
+    queryCheck: (s) => {
+        return document.createDocumentFragment().querySelector(s)
     },
     isSelector: (selector)=>{
-        return ut.isStr(selector)
+        try{
+            ut.isStr(selector) && ut.queryCheck(selector)
+        }catch{
+            return false
+        }
+        return true;
     },
     isElement: (element)=>{
         return ut.isObject(element)
