@@ -54,7 +54,7 @@ function InputEditor({input_text, refreshPreview}){
 function NavBar(props){
 
     return (
-        <nav className="navbar navbar-expand-lg text-bg-dark nav-resizable">
+        <nav id="m8-nav-resizable" className="navbar navbar-expand-lg text-bg-dark">
             <div className="container-fluid">
                 <a className="navbar-brand  text-light" href="#">Navbar</a>
                 <ul className="nav justify-content-end">
@@ -119,29 +119,34 @@ function ResizableWindows(props){
         console.log("Render ResizableWindows Component.")
         console.log(props);
     }
-
     /**
      * Instantiate PreviewerHelper class.
      * Used to collapse and resize Previewer Component windows
-     * @type {PreviewerHelper}
+     * @type {ResizableHelper}
      */
-    const helper = new PreviewerHelper({
+    const helper = new ResizableHelper({
         window: {
             // minWidth value must be the same as css media min-width
             minWidth: 768
         },
-        editor: {
+        nav:{
+            btLeft: '#m8-left-expand',
+            btCombo: '#m8-expand-combo',
+            btRight: '#m8-right-expand'
+        },
+        leftPane:{
             selector: '#previewer .editor-container',
             minWidth: 300,
         },
-        preview: {
+        rightPane:{
             selector: '#previewer .preview-container',
             minWidth: 300,
         },
-        resizeBar: {
+        resizeBar:{
             selector: '#previewer .preview-container'
         }
-    });
+
+    })
 
     /**
      * Mount and Unmount component hook
@@ -151,7 +156,7 @@ function ResizableWindows(props){
         if(debug) {
             console.log(`Mount ResizableWindows Component :------------->`);
         }
-        helper.getDataFromStorage();
+        helper.loadView();
         window.addEventListener('resize', handleResizeWindow)
         // returned function will be called on component unmount
         return () => {
@@ -195,7 +200,7 @@ function ResizableWindows(props){
         if(debug) {
             console.log(`handleDrag :->`);
         }
-        helper.resizeWindows();
+        helper.handleResizeWindow();
     }
 
     const handleDragEnd = (e) => {
@@ -240,7 +245,7 @@ function ResizableWindows(props){
             <div id="previewer"
                  className={`d-flex flex-column flex-md-row justify-content-md-between min-vh-100`}
             >
-                <div id="m8-editor-container" className="editor-container" style={helper.getEditorStyle()}>
+                <div id="m8-editor-container" className="editor-container" style={helper.getLeftPaneStyle()}>
                     <div className="card text-bg-dark border-light">
                         <div className="card-header border-light p-0">
                             <h2 className="d-flex flex-row align-items-center"></h2>
@@ -272,7 +277,7 @@ function ResizableWindows(props){
                     </button>
                     <div className="ghost-drag"></div>
                 </div>
-                <div id="m8-preview-container" className="preview-container" style={helper.getPreviewStyle()}>
+                <div id="m8-preview-container" className="preview-container" style={helper.getRightPaneStyle()}>
                     <div className="card text-bg-dark h-100 border-light">
                         <div className="card-header border-light p-0">
                             <h2 className="d-flex flex-row align-items-center"></h2>
