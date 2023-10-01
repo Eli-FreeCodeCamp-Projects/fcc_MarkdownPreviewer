@@ -1,7 +1,7 @@
 /**
  * Helper functions
  */
-const debug = true,
+const debug = false,
     defaultInput = "# Title 1\n" +
         "\n" +
         "Some text with inline code ``<div</div>``.\n" +
