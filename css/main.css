@@ -28,7 +28,7 @@ button i {
   pointer-events: none;
 }
 
-.nav-resizable .combo-expand {
+#m8-nav-resizable .combo-expand {
   display: none;
 }
 
@@ -78,7 +78,7 @@ button i {
 }
 
 @media only screen and (min-width: 768px) {
-  .nav-resizable .combo-expand {
+  #m8-nav-resizable .combo-expand {
     display: inherit;
   }
   #previewer .editor-container {

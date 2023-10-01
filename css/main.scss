@@ -33,7 +33,7 @@ header{
 button i{
   pointer-events: none; // add this line
 }
-.nav-resizable{
+#m8-nav-resizable{
   .combo-expand{
     display: none;
   }
@@ -96,7 +96,7 @@ button i{
 
 @media only screen and (min-width: 768px){
 
-  .nav-resizable{
+  #m8-nav-resizable{
     .combo-expand{
       display: inherit;
     }
