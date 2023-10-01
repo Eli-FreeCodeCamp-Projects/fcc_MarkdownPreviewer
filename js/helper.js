@@ -25,9 +25,7 @@ const debug = false,
         "Or... wait for it... **_both!_**\n" +
         "\n" +
         "\n" +
-        "![freeCodeCamp Logo](https://cdn.freecodecamp.org/testable-projects-fcc/images/fcc_secondary.svg)\n",
-    SESSION_STORAGE = "SESSION_STORAGE",
-    LOCAL_STORAGE = "LOCAL_STORAGE";
+        "![freeCodeCamp Logo](https://cdn.freecodecamp.org/testable-projects-fcc/images/fcc_secondary.svg)\n";
 
 /**
  * Data Storage Helper class
