@@ -219,7 +219,7 @@ class SidePane extends ResizableBase{
     static getPaneStyle(width){
         if(ut.isPositiveNumber(width)){
             return {
-                width: `${width}px`,
+                width: `${width}%`,
                 visibility: 'visible'
             }
         }else if(ut.isNumber(width) && width === 0){
@@ -270,7 +270,7 @@ class SidePane extends ResizableBase{
         const element = this.getElement();
         if(ut.isPositiveNumber(width)){
             element.style.visibility = '';
-            element.style.width = `${width}px`;
+            element.style.width = `${width}%`;
         }else{
             element.style.width = `${0}`;
             element.style.visibility = `hidden`;
@@ -634,7 +634,8 @@ class ResizableHelper extends ResizableBase{
 
     handleResizeWindow(){
         const mouseX = this.window.mouseLeft,
-            left_x = this.getOffsetLeft(this.leftPane.getElement()),
+            left_pane = this.leftPane.getElement(),
+            left_x = this.getOffsetLeft(left_pane),
             right_x = this.getOffsetLeft(this.rightPane.getElement()),
             right_w = this.getOffsetWith(this.resizeBar.getElement()),
             window_w = window.innerWidth,
@@ -642,11 +643,21 @@ class ResizableHelper extends ResizableBase{
             is_min_right = (mouseX <= window_w - this.rightPane.minWidth);
 
         if(is_min_left && is_min_right ){
-            const left_res = mouseX - left_x,
-                right_res = ((right_x + right_w) - mouseX);
+            // Get container width
+            const container = left_pane.parentElement,
+                container_width = this.getOffsetWith(container);
+            // Get width of left and right panes in pixel
+
+            const left_px = (mouseX - left_x),
+                right_px = ((right_x + right_w) - mouseX);
+
+            // and Transform width values in %
+            const left_width = ut.toFixedFloat(left_px * 100 / container_width),
+            right_width = ut.toFixedFloat(right_px * 100 / container_width);
+
             this.setAndResizePanes({
-                left_w: left_res,
-                right_w:  right_res,
+                left_w: left_width,
+                right_w:  right_width,
                 resizeBarLeft: mouseX
             });
         }
@@ -863,7 +874,7 @@ const resizePane = (element, newWidth) => {
  */
 const ut = {
     toFixedFloat: (fNum) => {
-        return parseFloat(fNum.toFixed(1));
+        return parseFloat(fNum.toFixed(2));
     },
     isObject: (value) => {
         return typeof value === 'object' && !Array.isArray(value) && value !== null
