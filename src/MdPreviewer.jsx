@@ -1,5 +1,5 @@
 import {ResizableContainer} from './components/resizableWindows.jsx'
-import './scss/MdPreviewer.css'
+import './css/MdPreviewer.css'
 
 export function MdPreviewer() {
 

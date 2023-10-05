@@ -10,9 +10,8 @@ export function NavBar(props){
 
     return (
         <nav id="m8-nav-resizable" className="navbar navbar-expand-lg text-bg-dark">
-            <div className="container-fluid">
-                <a className="navbar-brand  text-light" href="#">Navbar</a>
-                <ul className="nav justify-content-end">
+            <div className="container-fluid nav justify-content-end">
+                <ul className="nav">
                     <li className="nav-item px-1 left-expand">
                         <button
                             id="m8-left-expand"
