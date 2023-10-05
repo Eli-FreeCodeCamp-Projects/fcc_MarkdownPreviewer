@@ -1,68 +1,12 @@
+import { useEffect } from 'react'
 /**
- * React Markdown Preview App
+ * Resizable windows Component
  */
-const Provider = ReactRedux.Provider;
-const connect = ReactRedux.connect;
+import {ResizableHelper} from "../utils/resizableHelper.js";
+import {InputEditor} from './mdEditor.jsx'
+import {HtmlPreview} from './mdPreview.jsx'
 
-
-/**
- * Output Component
- */
-function HtmlPreview({output_text}){
-    if(debug) {
-        console.log("Render HtmlPreview Component.")
-    }
-
-    return(
-        <div
-            id="preview"
-            className={`container-fluid h-100`}
-            dangerouslySetInnerHTML={{ __html: output_text }}
-        />
-    )
-}
-
-/**
- * Editor Component
- */
-function InputEditor({refreshPreview}){
-    if(debug) {
-        console.log("Render InputEditor Component.")
-    }
-
-    React.useEffect(() => {
-        if(debug) {
-            console.log(`Mount InputEditor Component :------------->`);
-        }
-        const element = document.getElementById('editor');
-        if(!element.value){
-            element.value = defaultInput;
-        }
-    }, []);
-
-    const handleChange = (e) => {
-        const value = e.target.value;
-        refreshPreview(value)
-    }
-
-    return(
-        <div className={`container-fluid p-0`}>
-            <div className="form-floating">
-                    <textarea
-                        id="editor"
-                        name="editor"
-                        className="form-control text-bg-dark h-100 border-0"
-                        onChange={handleChange}>
-
-                    </textarea>
-                <label htmlFor="editor">Type your Markdown</label>
-
-            </div>
-        </div>
-    )
-}
-
-function NavBar(props){
+export function NavBar(props){
 
     return (
         <nav id="m8-nav-resizable" className="navbar navbar-expand-lg text-bg-dark">
@@ -111,15 +55,7 @@ function NavBar(props){
     )
 }
 
-/**
- * ResizableWindows Component.
- *
- */
-function ResizableWindows(props){
-    if(debug) {
-        console.log("Render ResizableWindows Component.")
-        console.log(props);
-    }
+export function ResizableWindows(props){
     /**
      * Instantiate PreviewerHelper class.
      * Used to collapse and resize Previewer Component windows
@@ -153,17 +89,11 @@ function ResizableWindows(props){
      * Mount and Unmount component hook
      * componentWillUnmount is simulated by returning a function inside the useEffect hook.
      */
-    React.useEffect(() => {
-        if(debug) {
-            console.log(`Mount ResizableWindows Component :------------->`);
-        }
+    useEffect(() => {
         helper.loadView();
         window.addEventListener('resize', handleResizeWindow)
         // returned function will be called on component unmount
         return () => {
-            if(debug) {
-                console.log(`UnMount ResizableWindows Component :------------->`);
-            }
             window.removeEventListener('resize', handleResizeWindow)
         }
     }, []);
@@ -177,9 +107,6 @@ function ResizableWindows(props){
         // see :
         //  - https://bugzilla.mozilla.org/show_bug.cgi?id=568313
         //  - https://bugzilla.mozilla.org/show_bug.cgi?id=646823#c4
-        if(debug) {
-            console.log(`handleDragStart :->`);
-        }
         helper.startResize()
         e.dataTransfer.effectAllowed = 'none';
         // set invisible element to ghost drag image to hidden ghost image
@@ -197,45 +124,28 @@ function ResizableWindows(props){
      * and update left position of resizer bar.
      */
     const handleDrag = () => {
-        if(debug) {
-            console.log(`handleDrag :->`);
-        }
         helper.handleResizeWindow();
     }
 
     const handleDragEnd = () => {
-        if(debug) {
-            console.log(`handleDragEnd :->`);
-        }
         helper.endResize();
-
         document.ondragover = null;
     }
 
     const handleDragOver = (e) => {
         if(helper.isOnResize()){
-            //console.log(`handleMouseMove :-> resizeStarted`);
             helper.setMouseLeft(e.pageX);
         }
     }
 
     const handleExpandWindow = (e) => {
-        if(debug) {
-            console.log(`handleExpandWindow ------------------------------------------->`);
-        }
         helper.ExpandWindow(e.target);
     }
     const handleComboView = () => {
-        if(debug) {
-            console.log(`handleComboView ------------------------------------------->`);
-        }
         helper.loadComboView();
     }
 
     const handleResizeWindow = () => {
-        if(debug) {
-            console.log(`handleResizeWindow ------------------------------------------->`);
-        }
         helper.resizeView()
     }
 
@@ -303,96 +213,16 @@ function ResizableWindows(props){
 
 }
 
-function ResizableContainer(){
-    if(debug) {
-        console.log("Render ResizableContainer Component.");
-    }
+export function ResizableContainer(){
+    const leftPane = <InputEditor/>
+    const rightPane = <HtmlPreview/>
     return(
         <section className="container-fluid min-vh-100">
             <header><h1>Markdown Previewer</h1></header>
             <ResizableWindows
-                leftPane=<EditorContainer />
-                rightPane=<PreviewContainer />
+                leftPane={leftPane}
+                rightPane={rightPane}
             />
         </section>
     )
 }
-
-/**
- * Main Root component
- **/
-class Root extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-    render(){
-        if(debug){
-            console.log("Render Root Component.");
-            console.log("Root props : ");
-            console.log(this.props);
-        }
-
-        return(
-            <ResizableContainer {...this.props} />
-        )
-    }
-}
-
-// React-Redux
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        refreshPreview: (text) => {
-            if(debug){
-                console.log("Refresh Preview.");
-                console.log("Dispatch data length.");
-                console.log(text.length);
-            }
-
-            dispatch(refreshPreview(text));
-        }
-    }
-};
-
-const mapStateToPropsRoot = (state) => {
-    return {
-        input_text: state.input_text,
-        output_text: state.output_text
-    }
-};
-
-const mapStateToPropsPreview = (state) => {
-    return {
-        output_text: state.output_text,
-        input_text: state.input_text
-    }
-};
-
-
-
-/*
-const EditorContainer = (props) => {
-    <InputEditor {...props} />
-}
-
-const PreviewContainer = (props) => {
-    <HtmlPreview {...props} />
-}*/
-
-const EditorContainer = connect(null, mapDispatchToProps)(InputEditor);
-const PreviewContainer = connect(mapStateToPropsPreview, null)(HtmlPreview);
-const RootContainer = connect(mapStateToPropsRoot, null)(Root);
-
-
-class AppWrapper extends React.Component {
-    render() {
-        return (
-            <Provider store={store}>
-                <Root/>
-            </Provider>
-        );
-    }
-}
-
-
-ReactDOM.render(<AppWrapper />, document.getElementById('main-app'));

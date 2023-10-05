@@ -1,107 +1,7 @@
+import {DataStorage} from './dataStorage.js'
+import {ut} from './utils.js'
 /**
- * Helper functions
- */
-const debug = false,
-    defaultInput = "# Title 1\n" +
-        "\n" +
-        "Some text with inline code ``<div</div>``.\n" +
-        "## Title 2   \n" +
-        "[Github acount](https://github.com/mano8)\n" +
-        "Here is a code block example:\n" +
-        "```\n" +
-        "<h1>Title 1</h1> \n" +
-        "<h2>Title 2</h2> \n" +
-        "```\n" +
-        "Here is a list example:\n" +
-        " - Item 1\n" +
-        " - Item 2\n" +
-        " - Item 3\n" +
-        " - Item 4\n" +
-        "  \n" +
-        "Here is a blockquote example:\n" +
-        "> Hello World !!!\n" +
-        "You can also make text **bold**... whoa!\n" +
-        "Or _italic_.\n" +
-        "Or... wait for it... **_both!_**\n" +
-        "\n" +
-        "\n" +
-        "![freeCodeCamp Logo](https://cdn.freecodecamp.org/testable-projects-fcc/images/fcc_secondary.svg)\n";
-
-/**
- * Data Storage Helper class
- * Used to load and save data from localStorage and/or sessionStorage
- * Contain only static methods and properties.
- */
-class DataStorage{
-    static SESSION_STORAGE = "SESSION_STORAGE"
-    static LOCAL_STORAGE = "LOCAL_STORAGE"
-
-    /**
-     * Test if is valid data storage key
-     * @param key The data storage key to test
-     * @return {Error|boolean}
-     */
-    static isStoreKey(key){
-        if(! ut.isAttrKey(key)){
-            return new Error(`Unable to get store data. Data key is invalid.`)
-        }
-        return true;
-    }
-
-    /**
-     * Select data storage to use.
-     * Can be sessionStorage or localStorage
-     * @param storage the storage name to use.
-     * @return {Error|any}
-     */
-    static getStore(storage){
-        switch(storage){
-            case DataStorage.SESSION_STORAGE:
-                return sessionStorage;
-            case DataStorage.LOCAL_STORAGE:
-                return localStorage;
-            default:
-                return new Error(`Invalid Storage type. Can be SESSION_STORAGE or LOCAL_STORAGE`);
-        }
-    }
-
-    /**
-     * Get Data from selected storage (localStorage or sessionStorage).
-     * By default, get data from localStorage.
-     * @param key The data storage key
-     * @param storage The storage to use (localStorage or sessionStorage)
-     * @return {*|null}
-     */
-    static getStoreData(key, storage= DataStorage.LOCAL_STORAGE){
-        DataStorage.isStoreKey(key);
-        const store = DataStorage.getStore(storage);
-        let storageData = store.getItem("m8Prv_sizes");
-        if(ut.isStr(storageData)){
-            storageData = JSON.parse(storageData);
-        }
-        return (ut.isObject(storageData)) ? storageData : null;
-    }
-
-    /**
-     * Save Data on selected storage (localStorage or sessionStorage)
-     * @param key {String} The data storage key
-     * @param data {Object} The data to store
-     * @param storage {String} The storage to use (localStorage or sessionStorage)
-     * @return {Error|boolean} Return true or Error if data is not a valid Object.
-     */
-    static setStoreData(key, data, storage= DataStorage.LOCAL_STORAGE) {
-        DataStorage.isStoreKey(key);
-        const store = DataStorage.getStore(storage);
-        if(!ut.isObject(data)){
-            return new Error(`Unable to set storage data. Data must be a valid object.`)
-        }
-        store.setItem("m8Prv_sizes", JSON.stringify(data));
-        return true;
-    }
-}
-
-/**
- *
+ * ResizableBase class
  */
 class ResizableBase{
 
@@ -290,7 +190,7 @@ class SidePane extends ResizableBase{
 }
 
 /**
- *
+ * ResizeBar class
  */
 class ResizeBar extends ResizableBase{
     constructor(props){
@@ -354,7 +254,7 @@ class ResizeBar extends ResizableBase{
 }
 
 /**
- *
+ * PreviewerNav class
  */
 class PreviewerNav extends ResizableBase{
 
@@ -462,6 +362,9 @@ class PreviewerNav extends ResizableBase{
     }
 }
 
+/**
+ * PreviewerWindow class
+ */
 class PreviewerWindow extends ResizableBase{
     constructor(props){
         super();
@@ -496,12 +399,7 @@ class PreviewerWindow extends ResizableBase{
     }
 
     setTypeWindow(){
-        this.isWide = this.isWideWindow(window.innerWidth)
-        if(debug) {
-            console.log(
-                `[setResizerState] Resizer is ${this.isWide} - window width: ${this.minWidth} / ${window.innerWidth} :------------------------------------>`
-            );
-        }
+        this.isWide = this.isWideWindow(window.innerWidth);
         return this.isWide;
     }
 
@@ -515,7 +413,7 @@ class PreviewerWindow extends ResizableBase{
  * This class is used to resize previewer windows.
  */
 
-class ResizableHelper extends ResizableBase{
+export class ResizableHelper extends ResizableBase{
     storageKey = null;
     window = null;
     nav = null;
@@ -653,7 +551,7 @@ class ResizableHelper extends ResizableBase{
 
             // and Transform width values in %
             const left_width = ut.toFixedFloat(left_px * 100 / container_width),
-            right_width = ut.toFixedFloat(right_px * 100 / container_width);
+                right_width = ut.toFixedFloat(right_px * 100 / container_width);
 
             this.setAndResizePanes({
                 left_w: left_width,
@@ -816,109 +714,5 @@ class ResizableHelper extends ResizableBase{
 
 }
 
-/**
- * Sanitize html string with DOMPurify.js package.
- *
- * @param text string to Sanitize
- *
- * @return string Return Sanitized Html string.
- */
-const sanitize_md = (text) => {
-    return DOMPurify.sanitize(
-        text, {USE_PROFILES: {html: true}, ADD_ATTR: ['target'] }
-    )
-}
 
-/**
- * Parse Markdown to Html with marked.js package
- * @param text string Markdown value to parse
- *
- * @return string Return parsed html string.
- */
-const parse_markdown = (text) => {
-    const link_extension = {
-        name: 'link',
-        renderer(token) {
-            return `<a target="_blank" href="${token.href}">${token.text}</a>`;
-        }
-    }
 
-    marked.use({
-        gfm: true,
-        breaks: true,
-        extensions: [
-            link_extension
-        ]
-    });
-    const result = marked.parse(text)
-    return sanitize_md(result)
-}
-
-/**
- * Resize element width, and set visibility to hidden if width value is <= to zero.
- * @param element
- * @param newWidth
- */
-const resizePane = (element, newWidth) => {
-    if(newWidth > 0){
-        element.style.visibility = `visible`;
-        element.style.width = `${newWidth}px`;
-    }else{
-        element.style.visibility = `hidden`;
-    }
-}
-
-/**
- * Helper Utilities
- * @type {{isObject: (function(*): *), isNumber: (function(*): *), isPositiveNumber: (function(*): *), isArray: (function(*): arg is any[]), isStr: (function(*): *)}}
- */
-const ut = {
-    toFixedFloat: (fNum) => {
-        return parseFloat(fNum.toFixed(2));
-    },
-    isObject: (value) => {
-        return typeof value === 'object' && !Array.isArray(value) && value !== null
-    },
-    isArray: (value) => {
-        return Array.isArray(value)
-    },
-    isNumber:(value) => {
-        return !isNaN(value) && value != null
-    },
-    isPositiveNumber: (value) => {
-        return ut.isNumber(value) && value > 0
-    },
-    isStr: (value) => {
-        return (typeof value === 'string' || value instanceof String)
-    },
-    /*
-    * Test if value is valid key.
-    *
-    */
-    isKey: (value) => {
-        return ut.isStr(value) && /(?=\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$/.test(value)
-    },
-
-    /*
-    * Test if value is valid attribute key.
-    *
-    */
-    isAttrKey: (value) => {
-        return ut.isStr(value) && /(?=[a-zA-Z0-9\-_]{1,80}$)^([a-zA-Z0-9]+(?:[_\-][a-zA-Z0-9]+)*)$/.test(value)
-    },
-    queryCheck: (s) => {
-        return document.createDocumentFragment().querySelector(s)
-    },
-    isSelector: (selector)=>{
-        try{
-            ut.isStr(selector) && ut.queryCheck(selector)
-        }catch{
-            return false
-        }
-        return true;
-    },
-    isElement: (element)=>{
-        return ut.isObject(element)
-    }
-
-}
