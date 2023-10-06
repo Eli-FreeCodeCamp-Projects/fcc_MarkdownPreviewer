@@ -1,8 +1,9 @@
-import {MdPreviewer} from './MdPreviewer.jsx'
+import {ResizableContainer} from './components/resizableWindows.jsx'
+import './css/main.css'
 
 function App() {
 
-  return <MdPreviewer />
+  return <ResizableContainer />
 }
 
 export default App
