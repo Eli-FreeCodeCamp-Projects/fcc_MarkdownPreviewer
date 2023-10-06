@@ -1,9 +1,15 @@
-import {ResizableContainer} from './components/resizableWindows.jsx'
+import {ResizableContainer} from './components/resizableContainer.jsx'
 import './css/main.css'
+import {InputEditor} from "./components/mdEditor.jsx";
+import {HtmlPreview} from "./components/mdPreview.jsx";
 
 function App() {
-
-  return <ResizableContainer />
+  const leftPane = <InputEditor/>
+  const rightPane = <HtmlPreview/>
+  return <ResizableContainer
+      leftPane={leftPane}
+      rightPane={rightPane}
+  />
 }
 
 export default App
