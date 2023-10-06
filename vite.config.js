@@ -8,6 +8,10 @@ const __dirname = path.dirname(__filename);
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+    build: {
+        outDir: './docs',
+        emptyOutDir: true
+    },
     resolve: {
         alias: {
             '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
