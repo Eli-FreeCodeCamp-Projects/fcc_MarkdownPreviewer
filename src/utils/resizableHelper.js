@@ -426,11 +426,20 @@ export class ResizableHelper extends ResizableBase{
         this.getDataFromStorage();
     }
 
-
+    /**
+     * Set window class props
+     * Define a min width for resize limit.
+     * @param props {{minWidth: Number}} The min with of window to limit resize.
+     */
     setWindow(props){
         this.window = new PreviewerWindow(props);
     }
 
+    /**
+     * Set Nav bar class props
+     * Define the nav buttons selectors.
+     * @param props {{btLeft: string, btCombo: string, btRight: string }} The css selector of nav buttons .
+     */
     setNav(props){
         this.nav = new PreviewerNav(props);
     }
@@ -457,6 +466,10 @@ export class ResizableHelper extends ResizableBase{
         }
     }
 
+    /**
+     * Test if all properties are ready.
+     * @return {boolean} Return true if all components are ready or false elsewhere.
+     */
     isReady(){
         return this.window.isReady()
             && this.nav.isReady()
