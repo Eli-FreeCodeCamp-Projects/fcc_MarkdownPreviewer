@@ -63,7 +63,8 @@ export function ResizableWindows(props){
     const helper = new ResizableHelper({
         window: {
             // minWidth value must be the same as css media min-width
-            minWidth: 768
+            minWidth: 768,
+            selector: '#m8-resizable-content'
         },
         nav:{
             btLeft: '#m8-left-expand',
