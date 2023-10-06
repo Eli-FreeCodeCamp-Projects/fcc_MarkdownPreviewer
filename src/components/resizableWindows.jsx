@@ -71,15 +71,15 @@ export function ResizableWindows(props){
             btRight: '#m8-right-expand'
         },
         leftPane:{
-            selector: '#previewer .editor-container',
+            selector: '#m8-resizable-content .left-container',
             minWidth: 300,
         },
         rightPane:{
-            selector: '#previewer .preview-container',
+            selector: '#m8-resizable-content .right-container',
             minWidth: 300,
         },
         resizeBar:{
-            selector: '#previewer .preview-container'
+            selector: '#m8-resizable-content .size-container'
         }
 
     })
@@ -151,10 +151,10 @@ export function ResizableWindows(props){
     return (
         <div className="resizable">
             <NavBar handleExpandWindow={handleExpandWindow} handleComboView={handleComboView} />
-            <div id="previewer"
+            <div id="m8-resizable-content"
                  className={`d-flex flex-column flex-md-row justify-content-md-between min-vh-100`}
             >
-                <div id="m8-editor-container" className="editor-container" style={helper.getLeftPaneStyle()}>
+                <div id="m8-left-container" className="left-container" style={helper.getLeftPaneStyle()}>
                     <div className="card text-bg-dark border-light">
                         <div className="card-header border-light p-0">
                             <h2 className="d-flex flex-row align-items-center"></h2>
@@ -186,7 +186,7 @@ export function ResizableWindows(props){
                     </button>
                     <div className="ghost-drag"></div>
                 </div>
-                <div id="m8-preview-container" className="preview-container" style={helper.getRightPaneStyle()}>
+                <div id="m8-right-container" className="right-container" style={helper.getRightPaneStyle()}>
                     <div className="card text-bg-dark h-100 border-light">
                         <div className="card-header border-light p-0">
                             <h2 className="d-flex flex-row align-items-center"></h2>
