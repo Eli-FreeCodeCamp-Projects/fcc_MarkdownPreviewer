@@ -180,8 +180,7 @@ export function ResizableWindows(props){
                     onDragStart={handleDragStart}
                     onDrag={handleDrag}
                     onDragEnd={handleDragEnd}
-                    draggable="true"
-                    style={helper.getResizeBarStyle()}>
+                    draggable="true">
                     <button type="button" className="btn btn-light">
                         <i className="fas fa-arrows-alt-h"></i>
                     </button>
