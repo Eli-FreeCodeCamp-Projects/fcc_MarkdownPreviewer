@@ -1,58 +1,9 @@
-import { useEffect } from 'react'
 /**
  * Resizable windows Component
  */
+import { useEffect } from 'react'
 import {ResizableHelper} from "../utils/resizableHelper.js";
-import {InputEditor} from './mdEditor.jsx'
-import {HtmlPreview} from './mdPreview.jsx'
-
-export function NavBar(props){
-
-    return (
-        <nav id="m8-nav-resizable" className="navbar navbar-expand-lg text-bg-dark">
-            <div className="container-fluid nav justify-content-end">
-                <ul className="nav">
-                    <li className="nav-item px-1 left-expand">
-                        <button
-                            id="m8-left-expand"
-                            className="btn btn-outline-light border-0"
-                            type="button"
-                            aria-expanded="false"
-                            aria-controls="m8_left_body"
-                            onClick={props.handleExpandWindow}
-                        >
-                            <i className="fas fa-code"></i>
-                        </button>
-                    </li>
-                    <li className="nav-item px-1 combo-expand">
-                        <button
-                            id="m8-expand-combo"
-                            className="btn btn-outline-light border-0 active"
-                            type="button"
-                            aria-expanded="false"
-                            onClick={props.handleComboView}
-                        >
-                            <i className="fas fa-columns"></i>
-                        </button>
-                    </li>
-                    <li className="nav-item px-1 right-expand">
-                        <button
-                            id="m8-right-expand"
-                            className="btn btn-outline-light border-0"
-                            type="button"
-                            aria-expanded="false"
-                            aria-controls="m8_right_body"
-                            onClick={props.handleExpandWindow}
-                        >
-                            <i className="fas fa-file-image"></i>
-                        </button>
-                    </li>
-                </ul>
-
-            </div>
-        </nav>
-    )
-}
+import {ResizableNav} from "./resizableNav.jsx";
 
 export function ResizableWindows(props){
     /**
@@ -151,7 +102,7 @@ export function ResizableWindows(props){
 
     return (
         <div className="resizable">
-            <NavBar handleExpandWindow={handleExpandWindow} handleComboView={handleComboView} />
+            <ResizableNav handleExpandWindow={handleExpandWindow} handleComboView={handleComboView} />
             <div id="m8-resizable-content"
                  className={`d-flex flex-column flex-md-row justify-content-md-between min-vh-100`}
             >
@@ -210,18 +161,4 @@ export function ResizableWindows(props){
 
     )
 
-}
-
-export function ResizableContainer(){
-    const leftPane = <InputEditor/>
-    const rightPane = <HtmlPreview/>
-    return(
-        <section className="container-fluid min-vh-100">
-            <header><h1>Markdown Previewer</h1></header>
-            <ResizableWindows
-                leftPane={leftPane}
-                rightPane={rightPane}
-            />
-        </section>
-    )
 }
