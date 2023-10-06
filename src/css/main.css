@@ -52,22 +52,23 @@ header h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 5px;
+    width: 10px;
     margin: 10px 0;
     border: 1px solid black;
-    background-color: linen;
+    background: linear-gradient(90deg, linen, black, linen);
     cursor: move;
   }
   #m8-resizable-content .size-container button {
     position: relative;
     top: 50%;
-    width: 40px;
-    height: 30px;
-    font-size: 1.2em;
+    width: 20px;
+    height: 20px;
+    font-size: 0.9em;
     z-index: 1;
     background-color: rgb(20, 30, 40);
     padding: 0;
-    cursor: move;
+    pointer-events: none;
+    border: none;
   }
   #m8-resizable-content .size-container button i {
     display: block;
