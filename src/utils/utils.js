@@ -3,8 +3,8 @@
  * @type {{isObject: (function(*): *), isNumber: (function(*): *), isPositiveNumber: (function(*): *), isArray: (function(*): arg is any[]), isStr: (function(*): *)}}
  */
 export const ut = {
-    toFixedFloat: (fNum) => {
-        return parseFloat(fNum.toFixed(2));
+    toFixedFloat: (fNum, fix = 2, defaultValue = null) => {
+        return (ut.isNumber(fNum) && ut.isNumber(fix)) ? parseFloat(fNum.toFixed(fix)) : defaultValue;
     },
     isObject: (value) => {
         return typeof value === 'object' && !Array.isArray(value) && value !== null
@@ -48,7 +48,7 @@ export const ut = {
         return true;
     },
     isElement: (element)=>{
-        return ut.isObject(element)
+        return element instanceof Element || element instanceof Document;
     }
 
 }
