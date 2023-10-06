@@ -50,11 +50,11 @@ class SidePane extends ResizableElement{
         if(ut.isPositiveNumber(width)){
             return {
                 width: `${width}%`,
-                visibility: 'visible'
+                display: ''
             }
         }else if(ut.isNumber(width) && width === 0){
             return {
-                visibility: 'hidden'
+                display: 'hidden'
             }
         }else{
             return null;
@@ -99,11 +99,11 @@ class SidePane extends ResizableElement{
     resizePane(width){
         const element = this.getElement();
         if(ut.isPositiveNumber(width)){
-            element.style.visibility = '';
+            element.style.display = '';
             element.style.width = `${width}%`;
         }else{
             element.style.width = `${0}`;
-            element.style.visibility = `hidden`;
+            element.style.display = `none`;
         }
     }
 
