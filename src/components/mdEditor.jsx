@@ -26,7 +26,7 @@ export function InputEditor(){
                     <textarea
                         id="editor"
                         name="editor"
-                        className="form-control text-bg-dark h-100 border-0"
+                        className="form-control text-bg-dark border-0"
                         onChange={handleChange}>
 
                     </textarea>
